@@ -118,11 +118,11 @@ export type AdminOperationsSnapshot = {
 };
 
 export const defaultStoreSettings: StoreSettings = {
-  phone: "",
-  email: "",
-  telegram: "",
-  whatsapp: "",
-  address: "",
+  phone: "+7 (495) 000-00-00",
+  email: "hello@example.ru",
+  telegram: "balloon_moscow_demo",
+  whatsapp: "+7 495 000-00-00",
+  address: "Москва, Большая Никитская улица, 24",
   workingHours: "09:00–21:00",
   minimumOrderRub: 3000,
   homeEyebrow: "Доставим праздник сегодня",

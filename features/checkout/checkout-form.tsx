@@ -11,6 +11,7 @@ import { getCartTotals } from "@/features/cart/pricing";
 import { useCartStore } from "@/features/cart/store";
 import { formatMoney } from "@/lib/money";
 import { useHydrated } from "@/lib/use-hydrated";
+import { useStoreSettings } from "@/features/store-settings/store";
 import { calculateDeliveryEstimate, getAvailableDeliverySlots, getEarliestDeliveryDate } from "./delivery";
 import { createOrder } from "./order-client";
 import { checkoutDetailsSchema, type CheckoutDetails } from "./order-schema";
@@ -47,6 +48,7 @@ export function CheckoutForm() {
   const router = useRouter();
   const hydrated = useHydrated();
   const products = useCatalogStore((state) => state.products);
+  const settings = useStoreSettings();
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
   const [submitError, setSubmitError] = useState("");
@@ -105,6 +107,13 @@ export function CheckoutForm() {
     });
     if (unavailable) {
       setSubmitError("В корзине есть недоступный товар. Вернитесь в корзину и удалите его.");
+      return;
+    }
+
+    if (totals.itemsTotalKopecks < settings.minimumOrderRub * 100) {
+      setSubmitError(
+        `Минимальная сумма заказа — ${formatMoney({ amountKopecks: settings.minimumOrderRub * 100, currency: "RUB" })}.`,
+      );
       return;
     }
 

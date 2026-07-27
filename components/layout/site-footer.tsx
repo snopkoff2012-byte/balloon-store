@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import type { StoreSettings } from "@/features/admin/data/types";
 import { mainNavigation } from "@/lib/navigation";
+import {
+  phoneHref,
+  telegramHref,
+  whatsappHref,
+} from "@/features/store-settings/links";
 
-export function SiteFooter() {
+export function SiteFooter({ settings }: { settings: StoreSettings }) {
   return (
     <footer className="mt-20 bg-[#2d222b] text-white sm:mt-28">
       <Container className="grid gap-10 py-12 sm:py-16 md:grid-cols-[1.25fr_0.8fr_0.95fr]">
@@ -22,7 +28,7 @@ export function SiteFooter() {
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             <a
-              href="https://t.me/balloon_moscow_demo"
+              href={telegramHref(settings.telegram)}
               className="rounded-full border border-white/14 px-4 py-2.5 text-sm font-bold transition hover:border-white/35 hover:bg-white/8 active:scale-95"
               target="_blank"
               rel="noreferrer"
@@ -30,7 +36,7 @@ export function SiteFooter() {
               Telegram
             </a>
             <a
-              href="https://wa.me/74950000000"
+              href={whatsappHref(settings.whatsapp)}
               className="rounded-full border border-white/14 px-4 py-2.5 text-sm font-bold transition hover:border-white/35 hover:bg-white/8 active:scale-95"
               target="_blank"
               rel="noreferrer"
@@ -61,18 +67,18 @@ export function SiteFooter() {
           </p>
           <div className="mt-5 grid gap-3 text-sm text-white/68">
             <a
-              href="tel:+74950000000"
+              href={phoneHref(settings.phone)}
               className="w-fit text-lg font-extrabold text-white hover:text-[#f2ad92]"
             >
-              +7 (495) 000-00-00
+              {settings.phone}
             </a>
             <a
-              href="mailto:hello@example.ru"
+              href={`mailto:${settings.email}`}
               className="w-fit hover:text-white"
             >
-              hello@example.ru
+              {settings.email}
             </a>
-            <p>Ежедневно, 09:00–21:00</p>
+            <p>Ежедневно, {settings.workingHours}</p>
           </div>
         </div>
       </Container>

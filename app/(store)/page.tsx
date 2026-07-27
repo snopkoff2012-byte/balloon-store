@@ -10,8 +10,16 @@ import {
   faqItems,
   reviews,
 } from "@/data/home";
+import {
+  phoneHref,
+  telegramHref,
+  whatsappHref,
+} from "@/features/store-settings/links";
+import { loadPublicStoreSettings } from "@/features/store-settings/server-repository";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await loadPublicStoreSettings();
+
   return (
     <>
       <section className="overflow-hidden border-b border-[#e8dfda]">
@@ -22,15 +30,13 @@ export default function HomePage() {
                 className="size-2 rounded-full bg-[#ef9d7f]"
                 aria-hidden="true"
               />
-              Принимаем заказы на сегодня
+              {settings.homeEyebrow}
             </p>
             <h1 className="mt-6 max-w-2xl font-display text-[3.05rem] leading-[0.98] tracking-[-0.045em] text-[#281d28] sm:text-6xl lg:text-[4.8rem]">
-              Шары, которые
-              <span className="block text-[#a42a4d]">создают настроение</span>
+              {settings.homeTitle}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-7 text-[#6d5f68] sm:text-lg sm:leading-8">
-              Современные композиции для важных моментов. Подберём палитру,
-              соберём вручную и доставим точно ко времени по Москве и области.
+              {settings.homeDescription}
             </p>
             <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
               <Link href="/catalog" className="button-primary">
@@ -420,7 +426,7 @@ export default function HomePage() {
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:w-96 lg:grid-cols-1">
                 <a
-                  href="https://t.me/balloon_moscow_demo"
+                  href={telegramHref(settings.telegram)}
                   className="button-light"
                   target="_blank"
                   rel="noreferrer"
@@ -431,7 +437,7 @@ export default function HomePage() {
                   Написать в Telegram
                 </a>
                 <a
-                  href="https://wa.me/74950000000"
+                  href={whatsappHref(settings.whatsapp)}
                   className="button-light"
                   target="_blank"
                   rel="noreferrer"
@@ -445,12 +451,12 @@ export default function HomePage() {
             </div>
             <div className="relative z-10 mt-8 flex flex-col gap-2 border-t border-white/18 pt-6 text-sm text-white/72 sm:flex-row sm:items-center sm:justify-between">
               <a
-                href="tel:+74950000000"
+                href={phoneHref(settings.phone)}
                 className="text-lg font-extrabold text-white hover:text-[#ffd5c5]"
               >
-                +7 (495) 000-00-00
+                {settings.phone}
               </a>
-              <p>На связи ежедневно, 09:00–21:00</p>
+              <p>На связи ежедневно, {settings.workingHours}</p>
             </div>
           </div>
         </Container>

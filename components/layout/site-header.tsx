@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { CartIndicator } from "@/components/cart/cart-indicator";
 import { Container } from "@/components/ui/container";
+import type { StoreSettings } from "@/features/admin/data/types";
 import { mainNavigation } from "@/lib/navigation";
+import { phoneHref } from "@/features/store-settings/links";
 import { MobileMenu } from "./mobile-menu";
 
-export function SiteHeader() {
+export function SiteHeader({ settings }: { settings: StoreSettings }) {
   return (
     <header className="sticky top-0 z-40">
       <div className="bg-[#342631] text-white">
@@ -57,11 +59,11 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2">
             <a
-              href="tel:+74950000000"
+              href={phoneHref(settings.phone)}
               className="hidden text-right md:block"
             >
               <span className="block text-sm font-extrabold text-[#342631]">
-                +7 (495) 000-00-00
+                {settings.phone}
               </span>
               <span className="block text-[11px] font-semibold text-[#a42a4d]">
                 Ответим за 5 минут

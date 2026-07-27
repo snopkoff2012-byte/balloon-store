@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import { BalloonPhotoPlaceholder } from "@/components/ui/balloon-photo-placeholder";
 import { Container } from "@/components/ui/container";
 import { PageHeading } from "@/components/ui/page-heading";
+import { phoneHref } from "@/features/store-settings/links";
+import { loadPublicStoreSettings } from "@/features/store-settings/server-repository";
 
 export const metadata: Metadata = {
   title: "Контакты",
   description: "Контакты магазина воздушных шаров «Воздушная Москва».",
 };
 
-export default function ContactsPage() {
+export default async function ContactsPage() {
+  const settings = await loadPublicStoreSettings();
+
   return (
     <Container className="py-10 sm:py-16">
       <PageHeading
@@ -22,13 +26,17 @@ export default function ContactsPage() {
             <div>
               <dt className="text-sm font-semibold text-[#82747c]">Телефон</dt>
               <dd className="mt-1 text-lg font-extrabold text-[#342831]">
-                +7 (495) 000-00-00
+                <a href={phoneHref(settings.phone)} className="hover:text-[#8d2444]">
+                  {settings.phone}
+                </a>
               </dd>
             </div>
             <div>
               <dt className="text-sm font-semibold text-[#82747c]">Почта</dt>
               <dd className="mt-1 text-lg font-extrabold text-[#342831]">
-                hello@example.ru
+                <a href={`mailto:${settings.email}`} className="hover:text-[#8d2444]">
+                  {settings.email}
+                </a>
               </dd>
             </div>
             <div>
@@ -36,7 +44,7 @@ export default function ContactsPage() {
                 Время работы
               </dt>
               <dd className="mt-1 text-lg font-extrabold text-[#342831]">
-                Ежедневно, 09:00–21:00
+                Ежедневно, {settings.workingHours}
               </dd>
             </div>
           </dl>
