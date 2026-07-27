@@ -94,9 +94,27 @@ function ProductDetailsContent({ productId }: { productId: string }) {
     (total, item) => total + item.value.priceModifierKopecks,
     0,
   );
-  const unitPrice = getProductPrice(product) + optionSurcharge;
+  const selectedValueIds = Object.values(selected).sort();
+  const selectedVariant =
+    product.variants.find(
+      (variant) =>
+        variant.optionValueIds.length === selectedValueIds.length &&
+        [...variant.optionValueIds]
+          .sort()
+          .every((value, index) => value === selectedValueIds[index]),
+    ) ?? null;
+  const variantSurcharge = selectedVariant?.priceModifierKopecks ?? 0;
+  const unitPrice = getProductPrice(product) + optionSurcharge + variantSurcharge;
+  const regularUnitPrice =
+    product.regularPriceKopecks + optionSurcharge + variantSurcharge;
   const related = getRelatedProducts(products, product, 3);
-  const unavailable = product.availabilityStatus === "out_of_stock";
+  const unavailable =
+    product.availabilityStatus === "out_of_stock" ||
+    (product.variants.length > 0 &&
+      (!selectedVariant ||
+        !selectedVariant.active ||
+        selectedVariant.availabilityStatus === "out_of_stock" ||
+        selectedVariant.stockQuantity === 0));
 
   return (
     <Container className="py-10 sm:py-14">
@@ -220,7 +238,7 @@ function ProductDetailsContent({ productId }: { productId: string }) {
             {product.regularPriceKopecks > getProductPrice(product) ? (
               <p className="pb-1 text-lg text-[#aa9ca3] line-through">
                 {formatMoney({
-                  amountKopecks: product.regularPriceKopecks + optionSurcharge,
+                  amountKopecks: regularUnitPrice,
                   currency: "RUB",
                 })}
               </p>
@@ -241,6 +259,7 @@ function ProductDetailsContent({ productId }: { productId: string }) {
             <AddToCartButton
               product={product}
               unitPriceKopecks={unitPrice}
+              regularUnitPriceKopecks={regularUnitPrice}
               selectedOptions={selected}
               selectedOptionLabels={selectedValues.map(
                 ({ option, value }) => `${option.name}: ${value.label}`,

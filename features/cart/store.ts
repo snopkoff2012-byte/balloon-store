@@ -56,7 +56,21 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "balloon-store-cart",
-      version: 2,
+      version: 3,
+      migrate: (persisted, version) => {
+        const state = persisted as CartStore;
+        if (version < 3) {
+          return {
+            ...state,
+            items: state.items.map((item) => ({
+              ...item,
+              regularUnitPriceKopecks:
+                item.regularUnitPriceKopecks ?? item.unitPriceKopecks,
+            })),
+          };
+        }
+        return state;
+      },
     },
   ),
 );

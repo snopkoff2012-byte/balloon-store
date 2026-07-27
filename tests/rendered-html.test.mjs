@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import "./loading-architecture.test.mjs";
+import "./cart-security.test.mjs";
 
 // Маршрутные тесты не зависят от внешней сети и проверяют аварийный каталог.
 // Реальный Supabase отдельно проверяется интеграционными запросами перед релизом.

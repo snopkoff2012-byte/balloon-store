@@ -1,0 +1,71 @@
+import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
+import { createOrderSchema, orderResultSchema } from "@/features/checkout/order-schema";
+import { getOptionalPublicEnvironment } from "@/lib/environment";
+
+export async function POST(request: Request) {
+  const environment = getOptionalPublicEnvironment();
+  if (!environment) {
+    return NextResponse.json(
+      { error: "Оформление заказа временно недоступно. Попробуйте позже." },
+      { status: 503 },
+    );
+  }
+
+  const payload = createOrderSchema.safeParse(await request.json().catch(() => null));
+  if (!payload.success) {
+    return NextResponse.json(
+      { error: "Проверьте данные заказа и состав корзины." },
+      { status: 400 },
+    );
+  }
+
+  const supabase = createClient(
+    environment.NEXT_PUBLIC_SUPABASE_URL,
+    environment.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    {
+      auth: { autoRefreshToken: false, persistSession: false },
+    },
+  );
+  const { data, error } = await supabase.rpc("create_public_order", {
+    order_input: {
+      customer_name: payload.data.name,
+      customer_phone: payload.data.phone,
+      customer_email: payload.data.email || null,
+      city: payload.data.city,
+      address: payload.data.address,
+      requested_delivery_date: payload.data.date,
+      requested_delivery_slot: payload.data.interval,
+      comment: payload.data.comment,
+      idempotency_key: payload.data.idempotencyKey,
+      items: payload.data.items.map((item) => ({
+        product_id: item.productId,
+        quantity: item.quantity,
+        selected_options: item.selectedOptions,
+      })),
+    },
+  });
+
+  if (error) {
+    const status = error.message.includes("CART_") ? 409 : 500;
+    return NextResponse.json(
+      {
+        error:
+          status === 409
+            ? "Состав корзины изменился: проверьте наличие и цену товара."
+            : "Не удалось создать заказ. Попробуйте ещё раз или напишите менеджеру.",
+      },
+      { status },
+    );
+  }
+
+  const result = orderResultSchema.safeParse(Array.isArray(data) ? data[0] : data);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: "Не удалось подтвердить состав заказа. Попробуйте ещё раз." },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json(result.data, { status: 201 });
+}

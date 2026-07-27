@@ -7,6 +7,7 @@ import type { Product } from "@/features/catalog/types";
 type AddToCartButtonProps = {
   product: Product;
   unitPriceKopecks: number;
+  regularUnitPriceKopecks: number;
   selectedOptions: Record<string, string>;
   selectedOptionLabels: string[];
   disabled?: boolean;
@@ -15,6 +16,7 @@ type AddToCartButtonProps = {
 export function AddToCartButton({
   product,
   unitPriceKopecks,
+  regularUnitPriceKopecks,
   selectedOptions,
   selectedOptionLabels,
   disabled = false,
@@ -31,6 +33,7 @@ export function AddToCartButton({
       selectedOptions,
       selectedOptionLabels,
       unitPriceKopecks,
+      regularUnitPriceKopecks,
       productName: product.name,
       productSlug: product.slug,
     });
