@@ -24,14 +24,16 @@ async function render(pathname) {
 
 const routes = [
   ["/", "Воздушная Москва"],
-  ["/catalog", "Воздушные шары"],
+  ["/catalog", "Шары для вашего события"],
   ["/catalog/nabory", "Готовые наборы шаров"],
   ["/product/nezhnyy-rassvet", "Нежный рассвет"],
   ["/cart", "Корзина"],
   ["/checkout", "Оформление заказа"],
   ["/delivery", "Доставка и оплата"],
   ["/contacts", "Контакты"],
-  ["/admin", "Административная панель"],
+  ["/admin", "Управление каталогом"],
+  ["/admin/categories", "Категории — управление"],
+  ["/admin/products", "Товары — управление"],
 ];
 
 for (const [pathname, expectedText] of routes) {

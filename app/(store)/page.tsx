@@ -1,14 +1,13 @@
 import Link from "next/link";
-import { ProductCard } from "@/components/catalog/product-card";
+import { FeaturedProducts } from "@/components/catalog/featured-products";
+import { PopularCategories } from "@/components/catalog/popular-categories";
 import { Container } from "@/components/ui/container";
 import { BalloonPhotoPlaceholder } from "@/components/ui/balloon-photo-placeholder";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { products } from "@/data/catalog";
 import {
   benefits,
   completedOrders,
   faqItems,
-  occasionCategories,
   reviews,
 } from "@/data/home";
 
@@ -101,34 +100,7 @@ export default function HomePage() {
               Весь каталог →
             </Link>
           </div>
-          <div className="-mx-4 mt-8 grid auto-cols-[82%] grid-flow-col gap-3 overflow-x-auto px-4 pb-4 [scrollbar-width:none] sm:mx-0 sm:grid-flow-row sm:grid-cols-2 sm:px-0 lg:grid-cols-3">
-            {occasionCategories.map((category) => (
-              <Link
-                key={category.title}
-                href={category.href}
-                className="interactive-card group flex min-h-44 snap-start flex-col justify-between rounded-[1.65rem] border border-[#e5dbd6] bg-white p-5 sm:min-h-48 sm:p-6"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <span
-                    className={`flex size-12 items-center justify-center rounded-full ${category.tone} text-xs font-black text-[#4b3944]`}
-                  >
-                    {category.mark}
-                  </span>
-                  <span className="flex size-9 items-center justify-center rounded-full border border-[#dfd3d7] text-[#8d2444] transition group-hover:bg-[#a42a4d] group-hover:text-white">
-                    <span aria-hidden="true">↗</span>
-                  </span>
-                </div>
-                <div className="mt-7">
-                  <h3 className="text-lg font-extrabold tracking-[-0.02em] text-[#30242d]">
-                    {category.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-[#7a6c74]">
-                    {category.note}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <PopularCategories />
           <Link
             href="/catalog"
             className="button-secondary mt-3 w-full sm:hidden"
@@ -153,15 +125,7 @@ export default function HomePage() {
               Все композиции →
             </Link>
           </div>
-          <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {products.slice(0, 3).map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                headingLevel="h3"
-              />
-            ))}
-          </div>
+          <FeaturedProducts />
         </Container>
       </section>
 

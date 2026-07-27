@@ -56,7 +56,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "balloon-store-cart",
-      version: 1,
+      version: 2,
     },
   ),
 );

@@ -1,0 +1,829 @@
+{
+  "categories": [
+    {
+      "id": "cat-occasion",
+      "name": "По событиям",
+      "slug": "povody",
+      "shortDescription": "Подборки композиций для важных событий.",
+      "fullDescription": "Выберите событие, чтобы быстро найти подходящие палитры, размеры и форматы композиций.",
+      "image": "/og.png",
+      "parentId": null,
+      "sortOrder": 10,
+      "publicationStatus": "published",
+      "seoTitle": "Воздушные шары для событий",
+      "seoDescription": "Шары для дня рождения, свадьбы, выписки и других событий с доставкой.",
+      "createdAt": "2026-07-01T09:00:00.000Z",
+      "updatedAt": "2026-07-01T09:00:00.000Z"
+    },
+    {
+      "id": "cat-sets",
+      "name": "Готовые наборы",
+      "slug": "nabory",
+      "shortDescription": "Сбалансированные наборы, готовые к заказу.",
+      "fullDescription": "Готовые сочетания шаров разных форм, размеров и оттенков. Каждый набор можно персонализировать.",
+      "image": "/og.png",
+      "parentId": null,
+      "sortOrder": 20,
+      "publicationStatus": "published",
+      "seoTitle": "Готовые наборы воздушных шаров",
+      "seoDescription": "Готовые наборы шаров с доставкой по Москве и области.",
+      "createdAt": "2026-07-01T09:05:00.000Z",
+      "updatedAt": "2026-07-01T09:05:00.000Z"
+    },
+    {
+      "id": "cat-helium",
+      "name": "Шары с гелием",
+      "slug": "shary-s-geliem",
+      "shortDescription": "Латексные и фольгированные шары поштучно и наборами.",
+      "fullDescription": "Однотонные, хромированные, прозрачные и фольгированные шары с профессиональной обработкой.",
+      "image": "/og.png",
+      "parentId": null,
+      "sortOrder": 30,
+      "publicationStatus": "published",
+      "seoTitle": "Воздушные шары с гелием",
+      "seoDescription": "Заказать гелиевые шары с доставкой по Москве.",
+      "createdAt": "2026-07-01T09:10:00.000Z",
+      "updatedAt": "2026-07-01T09:10:00.000Z"
+    },
+    {
+      "id": "cat-kids",
+      "name": "Детский праздник",
+      "slug": "detskie-prazdniki",
+      "shortDescription": "Яркие наборы, цифры и любимые герои.",
+      "fullDescription": "Композиции на детский день рождения, первый год и тематические вечеринки.",
+      "image": "/og.png",
+      "parentId": "cat-occasion",
+      "sortOrder": 10,
+      "publicationStatus": "published",
+      "seoTitle": "Шары на детский праздник",
+      "seoDescription": "Шары, цифры и композиции для детского праздника.",
+      "createdAt": "2026-07-01T09:15:00.000Z",
+      "updatedAt": "2026-07-01T09:15:00.000Z"
+    },
+    {
+      "id": "cat-wedding",
+      "name": "Свадьба",
+      "slug": "svadba",
+      "shortDescription": "Воздушные палитры и оформление фотозон.",
+      "fullDescription": "Свадебные композиции, оформление утра невесты, банкетного зала и фотозоны.",
+      "image": "/og.png",
+      "parentId": "cat-occasion",
+      "sortOrder": 20,
+      "publicationStatus": "published",
+      "seoTitle": "Воздушные шары на свадьбу",
+      "seoDescription": "Современные свадебные композиции из шаров.",
+      "createdAt": "2026-07-01T09:20:00.000Z",
+      "updatedAt": "2026-07-01T09:20:00.000Z"
+    },
+    {
+      "id": "cat-baby",
+      "name": "Выписка",
+      "slug": "vypiska",
+      "shortDescription": "Нежные композиции для первой встречи.",
+      "fullDescription": "Наборы на выписку из роддома для дома, встречи у роддома и семейной фотосессии.",
+      "image": "/og.png",
+      "parentId": "cat-occasion",
+      "sortOrder": 30,
+      "publicationStatus": "published",
+      "seoTitle": "Шары на выписку из роддома",
+      "seoDescription": "Нежные наборы шаров на выписку с доставкой.",
+      "createdAt": "2026-07-01T09:25:00.000Z",
+      "updatedAt": "2026-07-01T09:25:00.000Z"
+    },
+    {
+      "id": "cat-gender",
+      "name": "Гендер-пати",
+      "slug": "gender-pati",
+      "shortDescription": "Главный сюрприз и праздничное оформление.",
+      "fullDescription": "Большие шары-сюрпризы, фонтаны и фотозоны для гендер-пати.",
+      "image": "/og.png",
+      "parentId": "cat-occasion",
+      "sortOrder": 40,
+      "publicationStatus": "published",
+      "seoTitle": "Шары на гендер-пати",
+      "seoDescription": "Шары-сюрпризы и композиции для гендер-пати.",
+      "createdAt": "2026-07-01T09:30:00.000Z",
+      "updatedAt": "2026-07-01T09:30:00.000Z"
+    },
+    {
+      "id": "cat-romance",
+      "name": "Для двоих",
+      "slug": "romantika",
+      "shortDescription": "Сердца, признания и романтические сюрпризы.",
+      "fullDescription": "Композиции для свидания, предложения, годовщины и сюрприза без повода.",
+      "image": "/og.png",
+      "parentId": "cat-occasion",
+      "sortOrder": 50,
+      "publicationStatus": "published",
+      "seoTitle": "Романтические композиции из шаров",
+      "seoDescription": "Шары-сердца и романтические наборы с доставкой.",
+      "createdAt": "2026-07-01T09:35:00.000Z",
+      "updatedAt": "2026-07-01T09:35:00.000Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "product-sunrise",
+      "name": "Нежный рассвет",
+      "slug": "nezhnyy-rassvet",
+      "sku": "VM-SET-001",
+      "shortDescription": "Фонтан из шаров в пудровых оттенках.",
+      "fullDescription": "Лёгкая композиция для дня рождения, свидания или сюрприза. Оттенки и надпись можно изменить.",
+      "regularPriceKopecks": 599000,
+      "salePriceKopecks": 549000,
+      "costPriceKopecks": 238000,
+      "primaryCategoryId": "cat-sets",
+      "categoryIds": ["cat-sets", "cat-romance"],
+      "stockQuantity": 12,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": false,
+      "isBestseller": true,
+      "isNew": false,
+      "isRecommended": true,
+      "sortOrder": 10,
+      "colors": ["Пудровый", "Персиковый", "Хром розовое золото"],
+      "sizes": ["Компактный", "Стандартный", "Большой"],
+      "material": "Латекс и фольга",
+      "manufacturingTime": "60–90 минут",
+      "extraOptions": [
+        {
+          "code": "inscription",
+          "name": "Надпись",
+          "values": [
+            { "label": "Без надписи", "value": "none", "priceModifierKopecks": 0 },
+            { "label": "Короткая надпись", "value": "short", "priceModifierKopecks": 50000 }
+          ]
+        },
+        {
+          "code": "hifloat",
+          "name": "Обработка Hi-Float",
+          "values": [
+            { "label": "Без обработки", "value": "no", "priceModifierKopecks": 0 },
+            { "label": "С обработкой", "value": "yes", "priceModifierKopecks": 25000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T09:00:00.000Z"
+    },
+    {
+      "id": "product-confetti",
+      "name": "Конфетти-праздник",
+      "slug": "konfetti-prazdnik",
+      "sku": "VM-HEL-002",
+      "shortDescription": "Прозрачные шары с ярким конфетти.",
+      "fullDescription": "Компактный праздничный набор для фотозоны или сюрприза. Цвет конфетти и ленты можно выбрать.",
+      "regularPriceKopecks": 329000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 141000,
+      "primaryCategoryId": "cat-helium",
+      "categoryIds": ["cat-helium", "cat-sets"],
+      "stockQuantity": 18,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": false,
+      "isBestseller": true,
+      "isNew": false,
+      "isRecommended": false,
+      "sortOrder": 20,
+      "colors": ["Ягодный", "Золотой", "Серебряный"],
+      "sizes": ["Компактный", "Стандартный"],
+      "material": "Латекс и бумажное конфетти",
+      "manufacturingTime": "45–60 минут",
+      "extraOptions": [
+        {
+          "code": "ribbon",
+          "name": "Тип ленты",
+          "values": [
+            { "label": "Классическая", "value": "classic", "priceModifierKopecks": 0 },
+            { "label": "Атласная", "value": "satin", "priceModifierKopecks": 30000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T09:10:00.000Z"
+    },
+    {
+      "id": "product-star",
+      "name": "Звёздный герой",
+      "slug": "zvezdnyy-geroy",
+      "sku": "VM-KID-003",
+      "shortDescription": "Набор с большой фольгированной звездой.",
+      "fullDescription": "Эффектный набор для детского праздника. Палитру можно заменить на любую доступную.",
+      "regularPriceKopecks": 479000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 205000,
+      "primaryCategoryId": "cat-kids",
+      "categoryIds": ["cat-kids", "cat-sets"],
+      "stockQuantity": 8,
+      "availabilityStatus": "limited",
+      "isMadeToOrder": false,
+      "isBestseller": false,
+      "isNew": true,
+      "isRecommended": true,
+      "sortOrder": 30,
+      "colors": ["Синий", "Серебряный", "Хром синий"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Латекс и фольга",
+      "manufacturingTime": "60 минут",
+      "extraOptions": [
+        {
+          "code": "packaging",
+          "name": "Упаковка",
+          "values": [
+            { "label": "Транспортировочная", "value": "transport", "priceModifierKopecks": 0 },
+            { "label": "Подарочная", "value": "gift", "priceModifierKopecks": 40000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T09:20:00.000Z"
+    },
+    {
+      "id": "product-hearts",
+      "name": "Сердца XXL",
+      "slug": "serdtsa-xxl",
+      "sku": "VM-ROM-004",
+      "shortDescription": "Большие фольгированные сердца и шары в тон.",
+      "fullDescription": "Романтическая композиция для признания, годовщины или предложения с персональной надписью.",
+      "regularPriceKopecks": 749000,
+      "salePriceKopecks": 699000,
+      "costPriceKopecks": 312000,
+      "primaryCategoryId": "cat-romance",
+      "categoryIds": ["cat-romance", "cat-sets"],
+      "stockQuantity": 7,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": true,
+      "isBestseller": true,
+      "isNew": false,
+      "isRecommended": true,
+      "sortOrder": 40,
+      "colors": ["Красный", "Пудровый", "Хром розовое золото"],
+      "sizes": ["Стандартный", "Большой", "XL"],
+      "material": "Фольга и латекс",
+      "manufacturingTime": "90 минут",
+      "extraOptions": [
+        {
+          "code": "inscription",
+          "name": "Надпись",
+          "values": [
+            { "label": "Без надписи", "value": "none", "priceModifierKopecks": 0 },
+            { "label": "До 30 символов", "value": "personal", "priceModifierKopecks": 70000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T09:30:00.000Z"
+    },
+    {
+      "id": "product-cloud",
+      "name": "Розовое облако",
+      "slug": "rozovoe-oblako",
+      "sku": "VM-SET-005",
+      "shortDescription": "Большая воздушная композиция из шаров разных размеров.",
+      "fullDescription": "Объёмная композиция для заметного поздравления или оформления комнаты.",
+      "regularPriceKopecks": 849000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 352000,
+      "primaryCategoryId": "cat-sets",
+      "categoryIds": ["cat-sets", "cat-kids", "cat-romance"],
+      "stockQuantity": 5,
+      "availabilityStatus": "limited",
+      "isMadeToOrder": true,
+      "isBestseller": true,
+      "isNew": false,
+      "isRecommended": false,
+      "sortOrder": 50,
+      "colors": ["Розовый", "Молочный", "Хром серебряный"],
+      "sizes": ["Большой", "XL"],
+      "material": "Латекс",
+      "manufacturingTime": "90–120 минут",
+      "extraOptions": [
+        {
+          "code": "base",
+          "name": "Основание композиции",
+          "values": [
+            { "label": "Грузик", "value": "weight", "priceModifierKopecks": 0 },
+            { "label": "Декоративная коробка", "value": "box", "priceModifierKopecks": 80000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T09:40:00.000Z"
+    },
+    {
+      "id": "product-number",
+      "name": "Цифра с фонтаном",
+      "slug": "tsifra-s-fontanom",
+      "sku": "VM-KID-006",
+      "shortDescription": "Большая цифра и два фонтана из шаров.",
+      "fullDescription": "Универсальный набор на день рождения. Выберите цифру, палитру и количество шаров.",
+      "regularPriceKopecks": 579000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 248000,
+      "primaryCategoryId": "cat-kids",
+      "categoryIds": ["cat-kids", "cat-sets"],
+      "stockQuantity": 14,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": true,
+      "isBestseller": true,
+      "isNew": false,
+      "isRecommended": true,
+      "sortOrder": 60,
+      "colors": ["Лавандовый", "Голубой", "Персиковый"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Фольга и латекс",
+      "manufacturingTime": "75 минут",
+      "extraOptions": [
+        {
+          "code": "balloon_count",
+          "name": "Количество шаров",
+          "values": [
+            { "label": "14 шаров", "value": "14", "priceModifierKopecks": 0 },
+            { "label": "20 шаров", "value": "20", "priceModifierKopecks": 120000 },
+            { "label": "28 шаров", "value": "28", "priceModifierKopecks": 260000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T09:50:00.000Z"
+    },
+    {
+      "id": "product-wedding-air",
+      "name": "Свадебный воздух",
+      "slug": "svadebnyy-vozduh",
+      "sku": "VM-WED-007",
+      "shortDescription": "Молочно-золотая композиция для утра невесты.",
+      "fullDescription": "Воздушная свадебная композиция в спокойной палитре для номера, дома или фотозоны.",
+      "regularPriceKopecks": 929000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 391000,
+      "primaryCategoryId": "cat-wedding",
+      "categoryIds": ["cat-wedding", "cat-sets"],
+      "stockQuantity": null,
+      "availabilityStatus": "preorder",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": true,
+      "isRecommended": true,
+      "sortOrder": 70,
+      "colors": ["Молочный", "Золотой", "Хром шампань"],
+      "sizes": ["Стандартный", "Большой", "XL"],
+      "material": "Латекс и фольга",
+      "manufacturingTime": "2–3 часа",
+      "extraOptions": [
+        {
+          "code": "ribbon",
+          "name": "Тип ленты",
+          "values": [
+            { "label": "Классическая", "value": "classic", "priceModifierKopecks": 0 },
+            { "label": "Атласная", "value": "satin", "priceModifierKopecks": 30000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T10:00:00.000Z"
+    },
+    {
+      "id": "product-gender-secret",
+      "name": "Главный секрет",
+      "slug": "glavnyy-sekret",
+      "sku": "VM-GEN-008",
+      "shortDescription": "Большой шар-сюрприз для гендер-пати.",
+      "fullDescription": "Непрозрачный шар с конфетти нужного цвета, декоративной лентой и возможностью добавить надпись.",
+      "regularPriceKopecks": 499000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 210000,
+      "primaryCategoryId": "cat-gender",
+      "categoryIds": ["cat-gender", "cat-helium"],
+      "stockQuantity": 10,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": true,
+      "isBestseller": true,
+      "isNew": false,
+      "isRecommended": true,
+      "sortOrder": 80,
+      "colors": ["Чёрный", "Белый"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Латекс и конфетти",
+      "manufacturingTime": "60 минут",
+      "extraOptions": [
+        {
+          "code": "inscription",
+          "name": "Надпись",
+          "values": [
+            { "label": "Без надписи", "value": "none", "priceModifierKopecks": 0 },
+            { "label": "Персональная", "value": "personal", "priceModifierKopecks": 50000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T10:10:00.000Z"
+    },
+    {
+      "id": "product-welcome-home",
+      "name": "Добро пожаловать",
+      "slug": "dobro-pozhalovat",
+      "sku": "VM-BAB-009",
+      "shortDescription": "Нежный набор для встречи малыша.",
+      "fullDescription": "Композиция на выписку из роддома с фольгированной фигурой и шарами в выбранной палитре.",
+      "regularPriceKopecks": 689000,
+      "salePriceKopecks": 649000,
+      "costPriceKopecks": 274000,
+      "primaryCategoryId": "cat-baby",
+      "categoryIds": ["cat-baby", "cat-sets"],
+      "stockQuantity": 9,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": true,
+      "isRecommended": true,
+      "sortOrder": 90,
+      "colors": ["Пудровый", "Голубой", "Молочный"],
+      "sizes": ["Компактный", "Стандартный", "Большой"],
+      "material": "Латекс и фольга",
+      "manufacturingTime": "90 минут",
+      "extraOptions": [
+        {
+          "code": "packaging",
+          "name": "Упаковка",
+          "values": [
+            { "label": "Транспортировочная", "value": "transport", "priceModifierKopecks": 0 },
+            { "label": "Подарочная", "value": "gift", "priceModifierKopecks": 40000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T10:20:00.000Z"
+    },
+    {
+      "id": "product-chrome-night",
+      "name": "Хромированная ночь",
+      "slug": "hromirovannaya-noch",
+      "sku": "VM-HEL-010",
+      "shortDescription": "Глубокая композиция из хромированных шаров.",
+      "fullDescription": "Контрастный набор для вечеринки, мужского дня рождения или эффектной фотозоны.",
+      "regularPriceKopecks": 759000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 335000,
+      "primaryCategoryId": "cat-helium",
+      "categoryIds": ["cat-helium", "cat-sets"],
+      "stockQuantity": 0,
+      "availabilityStatus": "out_of_stock",
+      "isMadeToOrder": false,
+      "isBestseller": false,
+      "isNew": false,
+      "isRecommended": true,
+      "sortOrder": 100,
+      "colors": ["Хром графит", "Хром серебряный", "Чёрный"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Латекс хром",
+      "manufacturingTime": "90 минут",
+      "extraOptions": [],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T10:30:00.000Z"
+    },
+    {
+      "id": "product-pastel-birthday",
+      "name": "Пастельный день",
+      "slug": "pastelnyy-den",
+      "sku": "VM-KID-011",
+      "shortDescription": "Спокойная композиция на детский день рождения.",
+      "fullDescription": "Пастельный набор с возможностью выбрать цифру, количество шаров и подарочную упаковку.",
+      "regularPriceKopecks": 619000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 259000,
+      "primaryCategoryId": "cat-kids",
+      "categoryIds": ["cat-kids", "cat-sets"],
+      "stockQuantity": 11,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": true,
+      "isRecommended": false,
+      "sortOrder": 110,
+      "colors": ["Лавандовый", "Мятный", "Персиковый"],
+      "sizes": ["Компактный", "Стандартный", "Большой"],
+      "material": "Латекс",
+      "manufacturingTime": "75 минут",
+      "extraOptions": [
+        {
+          "code": "balloon_count",
+          "name": "Количество шаров",
+          "values": [
+            { "label": "12 шаров", "value": "12", "priceModifierKopecks": 0 },
+            { "label": "18 шаров", "value": "18", "priceModifierKopecks": 110000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T10:40:00.000Z"
+    },
+    {
+      "id": "product-berry-accent",
+      "name": "Ягодный акцент",
+      "slug": "yagodnyy-aktsent",
+      "sku": "VM-SET-012",
+      "shortDescription": "Стильная ягодно-персиковая композиция.",
+      "fullDescription": "Современный набор в фирменной палитре магазина для домашнего праздника или фотосессии.",
+      "regularPriceKopecks": 799000,
+      "salePriceKopecks": 749000,
+      "costPriceKopecks": 320000,
+      "primaryCategoryId": "cat-sets",
+      "categoryIds": ["cat-sets", "cat-romance"],
+      "stockQuantity": 6,
+      "availabilityStatus": "limited",
+      "isMadeToOrder": true,
+      "isBestseller": true,
+      "isNew": true,
+      "isRecommended": true,
+      "sortOrder": 120,
+      "colors": ["Ягодный", "Персиковый", "Лавандовый"],
+      "sizes": ["Стандартный", "Большой", "XL"],
+      "material": "Латекс",
+      "manufacturingTime": "90–120 минут",
+      "extraOptions": [
+        {
+          "code": "base",
+          "name": "Основание композиции",
+          "values": [
+            { "label": "Грузик", "value": "weight", "priceModifierKopecks": 0 },
+            { "label": "Декоративная коробка", "value": "box", "priceModifierKopecks": 80000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T10:50:00.000Z"
+    },
+    {
+      "id": "product-silver-duo",
+      "name": "Серебряный дуэт",
+      "slug": "serebryanyy-duet",
+      "sku": "VM-WED-013",
+      "shortDescription": "Два фонтана в молочно-серебряной палитре.",
+      "fullDescription": "Лаконичная парная композиция для свадьбы, годовщины или оформления входной зоны.",
+      "regularPriceKopecks": 879000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 374000,
+      "primaryCategoryId": "cat-wedding",
+      "categoryIds": ["cat-wedding", "cat-sets"],
+      "stockQuantity": null,
+      "availabilityStatus": "preorder",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": false,
+      "isRecommended": true,
+      "sortOrder": 130,
+      "colors": ["Молочный", "Хром серебряный", "Прозрачный"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Латекс и фольга",
+      "manufacturingTime": "2 часа",
+      "extraOptions": [
+        {
+          "code": "hifloat",
+          "name": "Обработка Hi-Float",
+          "values": [
+            { "label": "Без обработки", "value": "no", "priceModifierKopecks": 0 },
+            { "label": "С обработкой", "value": "yes", "priceModifierKopecks": 25000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T11:00:00.000Z"
+    },
+    {
+      "id": "product-sunny-mix",
+      "name": "Солнечный микс",
+      "slug": "solnechnyy-miks",
+      "sku": "VM-HEL-014",
+      "shortDescription": "Яркий микс гелиевых шаров.",
+      "fullDescription": "Универсальный набор для поздравления, который можно собрать из 9, 15 или 25 шаров.",
+      "regularPriceKopecks": 359000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 149000,
+      "primaryCategoryId": "cat-helium",
+      "categoryIds": ["cat-helium", "cat-kids"],
+      "stockQuantity": 25,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": false,
+      "isBestseller": false,
+      "isNew": false,
+      "isRecommended": false,
+      "sortOrder": 140,
+      "colors": ["Жёлтый", "Персиковый", "Мятный"],
+      "sizes": ["Компактный", "Стандартный", "Большой"],
+      "material": "Латекс",
+      "manufacturingTime": "45 минут",
+      "extraOptions": [
+        {
+          "code": "balloon_count",
+          "name": "Количество шаров",
+          "values": [
+            { "label": "9 шаров", "value": "9", "priceModifierKopecks": 0 },
+            { "label": "15 шаров", "value": "15", "priceModifierKopecks": 130000 },
+            { "label": "25 шаров", "value": "25", "priceModifierKopecks": 320000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T11:10:00.000Z"
+    },
+    {
+      "id": "product-love-letter",
+      "name": "Любовное письмо",
+      "slug": "lyubovnoe-pismo",
+      "sku": "VM-ROM-015",
+      "shortDescription": "Сердце с персональной надписью и фонтаном.",
+      "fullDescription": "Романтический набор с большой надписью, подарочной лентой и шарами в выбранной палитре.",
+      "regularPriceKopecks": 639000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 268000,
+      "primaryCategoryId": "cat-romance",
+      "categoryIds": ["cat-romance", "cat-helium"],
+      "stockQuantity": 8,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": true,
+      "isRecommended": true,
+      "sortOrder": 150,
+      "colors": ["Красный", "Пудровый", "Белый"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Фольга и латекс",
+      "manufacturingTime": "75 минут",
+      "extraOptions": [
+        {
+          "code": "inscription",
+          "name": "Надпись",
+          "values": [
+            { "label": "Короткая", "value": "short", "priceModifierKopecks": 0 },
+            { "label": "Персональная", "value": "personal", "priceModifierKopecks": 70000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T11:20:00.000Z"
+    },
+    {
+      "id": "product-little-prince",
+      "name": "Маленький принц",
+      "slug": "malenkiy-prints",
+      "sku": "VM-BAB-016",
+      "shortDescription": "Голубая композиция на выписку.",
+      "fullDescription": "Нежный набор с фольгированной фигурой, облаками и возможностью добавить имя малыша.",
+      "regularPriceKopecks": 719000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 301000,
+      "primaryCategoryId": "cat-baby",
+      "categoryIds": ["cat-baby", "cat-sets"],
+      "stockQuantity": 7,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": false,
+      "isRecommended": false,
+      "sortOrder": 160,
+      "colors": ["Голубой", "Молочный", "Хром серебряный"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Латекс и фольга",
+      "manufacturingTime": "90 минут",
+      "extraOptions": [
+        {
+          "code": "inscription",
+          "name": "Надпись",
+          "values": [
+            { "label": "Без имени", "value": "none", "priceModifierKopecks": 0 },
+            { "label": "Имя малыша", "value": "name", "priceModifierKopecks": 50000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T11:30:00.000Z"
+    },
+    {
+      "id": "product-little-princess",
+      "name": "Маленькая принцесса",
+      "slug": "malenkaya-printsessa",
+      "sku": "VM-BAB-017",
+      "shortDescription": "Пудровая композиция на выписку.",
+      "fullDescription": "Нежный набор с фольгированной фигурой, цветами и возможностью добавить имя малышки.",
+      "regularPriceKopecks": 719000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 301000,
+      "primaryCategoryId": "cat-baby",
+      "categoryIds": ["cat-baby", "cat-sets"],
+      "stockQuantity": 6,
+      "availabilityStatus": "limited",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": false,
+      "isRecommended": false,
+      "sortOrder": 170,
+      "colors": ["Пудровый", "Молочный", "Хром розовое золото"],
+      "sizes": ["Стандартный", "Большой"],
+      "material": "Латекс и фольга",
+      "manufacturingTime": "90 минут",
+      "extraOptions": [
+        {
+          "code": "inscription",
+          "name": "Надпись",
+          "values": [
+            { "label": "Без имени", "value": "none", "priceModifierKopecks": 0 },
+            { "label": "Имя малышки", "value": "name", "priceModifierKopecks": 50000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T11:40:00.000Z"
+    },
+    {
+      "id": "product-white-loft",
+      "name": "Белый лофт",
+      "slug": "belyy-loft",
+      "sku": "VM-WED-018",
+      "shortDescription": "Минималистичная белая композиция.",
+      "fullDescription": "Лаконичный набор для современной свадьбы, делового события или светлого интерьера.",
+      "regularPriceKopecks": 829000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 347000,
+      "primaryCategoryId": "cat-wedding",
+      "categoryIds": ["cat-wedding", "cat-helium"],
+      "stockQuantity": null,
+      "availabilityStatus": "preorder",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": true,
+      "isRecommended": true,
+      "sortOrder": 180,
+      "colors": ["Белый", "Молочный", "Прозрачный"],
+      "sizes": ["Стандартный", "Большой", "XL"],
+      "material": "Латекс",
+      "manufacturingTime": "2 часа",
+      "extraOptions": [
+        {
+          "code": "base",
+          "name": "Основание композиции",
+          "values": [
+            { "label": "Грузик", "value": "weight", "priceModifierKopecks": 0 },
+            { "label": "Белая коробка", "value": "box", "priceModifierKopecks": 80000 }
+          ]
+        }
+      ],
+      "publicationStatus": "published",
+      "createdAt": "2026-07-02T11:50:00.000Z"
+    },
+    {
+      "id": "product-eco-kraft",
+      "name": "Крафтовый праздник",
+      "slug": "kraftovyy-prazdnik",
+      "sku": "VM-SET-019",
+      "shortDescription": "Тёплая композиция с крафтовыми деталями.",
+      "fullDescription": "Экспериментальный набор в природной палитре. Скрыт из публичного каталога для проверки статусов.",
+      "regularPriceKopecks": 669000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 282000,
+      "primaryCategoryId": "cat-sets",
+      "categoryIds": ["cat-sets"],
+      "stockQuantity": 3,
+      "availabilityStatus": "limited",
+      "isMadeToOrder": true,
+      "isBestseller": false,
+      "isNew": false,
+      "isRecommended": false,
+      "sortOrder": 190,
+      "colors": ["Бежевый", "Терракотовый", "Молочный"],
+      "sizes": ["Компактный", "Стандартный"],
+      "material": "Латекс и крафт",
+      "manufacturingTime": "90 минут",
+      "extraOptions": [],
+      "publicationStatus": "hidden",
+      "createdAt": "2026-07-02T12:00:00.000Z"
+    },
+    {
+      "id": "product-mini-surprise",
+      "name": "Мини-сюрприз",
+      "slug": "mini-syurpriz",
+      "sku": "VM-SET-020",
+      "shortDescription": "Небольшой набор для приятного знака внимания.",
+      "fullDescription": "Компактная композиция, сохранённая как черновик для проверки административного сценария.",
+      "regularPriceKopecks": 249000,
+      "salePriceKopecks": null,
+      "costPriceKopecks": 105000,
+      "primaryCategoryId": "cat-sets",
+      "categoryIds": ["cat-sets", "cat-romance"],
+      "stockQuantity": 15,
+      "availabilityStatus": "in_stock",
+      "isMadeToOrder": false,
+      "isBestseller": false,
+      "isNew": true,
+      "isRecommended": false,
+      "sortOrder": 200,
+      "colors": ["Пудровый", "Лавандовый", "Молочный"],
+      "sizes": ["Компактный"],
+      "material": "Латекс",
+      "manufacturingTime": "30 минут",
+      "extraOptions": [],
+      "publicationStatus": "draft",
+      "createdAt": "2026-07-02T12:10:00.000Z"
+    }
+  ]
+}
