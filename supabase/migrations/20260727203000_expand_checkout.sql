@@ -19,6 +19,9 @@ alter table public.orders
   drop constraint if exists orders_fulfillment_method_check,
   add constraint orders_fulfillment_method_check check (fulfillment_method in ('delivery', 'pickup'));
 
+alter table public.orders
+  drop constraint if exists orders_status_check;
+
 update public.orders
 set status = case status
   when 'assembling' then 'preparing'
@@ -28,11 +31,13 @@ set status = case status
 end;
 
 alter table public.orders
-  drop constraint if exists orders_status_check,
   add constraint orders_status_check check (status in (
     'new', 'confirmed', 'awaiting_payment', 'paid', 'preparing',
     'handed_to_courier', 'completed', 'cancelled'
   ));
+
+alter table public.order_status_history
+  drop constraint if exists order_status_history_status_check;
 
 update public.order_status_history
 set status = case status
@@ -43,7 +48,6 @@ set status = case status
 end;
 
 alter table public.order_status_history
-  drop constraint if exists order_status_history_status_check,
   add constraint order_status_history_status_check check (status in (
     'new', 'confirmed', 'awaiting_payment', 'paid', 'preparing',
     'handed_to_courier', 'completed', 'cancelled'
