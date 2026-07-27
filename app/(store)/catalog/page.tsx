@@ -26,9 +26,9 @@ export default function CatalogPage() {
           <Link
             key={category.slug}
             href={`/catalog/${category.slug}`}
-            className="shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-rose-200 hover:text-rose-700"
+            className="shrink-0 rounded-full border border-[#ddd1d6] bg-white px-4 py-2.5 text-sm font-bold text-[#62545d] transition hover:border-[#b88c9c] hover:text-[#8d2444] active:scale-95"
           >
-            {category.emoji} {category.shortName}
+            {category.shortName}
           </Link>
         ))}
       </nav>

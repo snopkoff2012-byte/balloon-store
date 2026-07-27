@@ -12,15 +12,15 @@ export function PageHeading({
   return (
     <div className="max-w-3xl">
       {eyebrow ? (
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-rose-600">
+        <p className="mb-3 text-xs font-extrabold uppercase tracking-[0.2em] text-[#a42a4d]">
           {eyebrow}
         </p>
       ) : null}
-      <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-5xl">
+      <h1 className="font-display text-4xl leading-[1.08] tracking-[-0.03em] text-[#281d28] sm:text-6xl">
         {title}
       </h1>
       {description ? (
-        <p className="mt-5 text-base leading-7 text-slate-600 sm:text-lg">
+        <p className="mt-5 text-base leading-7 text-[#6f626d] sm:text-lg">
           {description}
         </p>
       ) : null}

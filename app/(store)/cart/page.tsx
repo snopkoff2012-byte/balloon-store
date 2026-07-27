@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Container } from "@/components/ui/container";
 import { PageHeading } from "@/components/ui/page-heading";
 import { CartView } from "@/features/cart/cart-view";
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function CartPage() {
   return (
-    <section className="py-10 sm:py-14">
+    <Container className="py-10 sm:py-16">
       <PageHeading
         eyebrow="Ваш заказ"
         title="Корзина"
@@ -18,6 +19,6 @@ export default function CartPage() {
       <div className="mt-8">
         <CartView />
       </div>
-    </section>
+    </Container>
   );
 }

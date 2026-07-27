@@ -58,4 +58,9 @@ test("does not expose the disposable starter preview", async () => {
   assert.doesNotMatch(html, /Your site is taking shape/i);
   assert.match(html, /Каталог/i);
   assert.match(html, /Доставка и оплата/i);
+  assert.match(html, /Соберите свою композицию/i);
+  assert.match(html, /Недавние заказы/i);
+  assert.match(html, /Вопросы и ответы/i);
+  assert.match(html, /Telegram/i);
+  assert.match(html, /WhatsApp/i);
 });

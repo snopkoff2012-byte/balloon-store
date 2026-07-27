@@ -28,7 +28,7 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
       type="button"
       onClick={handleAdd}
       disabled={!product.inStock}
-      className="w-full rounded-2xl bg-rose-600 px-6 py-4 text-base font-bold text-white shadow-lg shadow-rose-600/20 transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+      className="button-primary w-full rounded-2xl disabled:cursor-not-allowed disabled:border-[#cfc5c9] disabled:bg-[#cfc5c9] disabled:shadow-none"
     >
       {isAdded ? "Добавлено в корзину" : "Добавить в корзину"}
     </button>

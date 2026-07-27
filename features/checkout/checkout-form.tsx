@@ -36,14 +36,14 @@ export function CheckoutForm() {
 
   if (isSubmitted) {
     return (
-      <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-8">
+      <div className="rounded-[1.75rem] border border-[#bdd8c8] bg-[#edf7f0] p-8">
         <p className="text-4xl" aria-hidden="true">
           ✅
         </p>
-        <h2 className="mt-4 text-2xl font-bold text-emerald-950">
+        <h2 className="mt-4 text-2xl font-extrabold text-[#244532]">
           Демо-форма работает
         </h2>
-        <p className="mt-3 leading-7 text-emerald-800">
+        <p className="mt-3 leading-7 text-[#3f6a50]">
           Данные прошли проверку, но заказ не был отправлен: реальная база будет
           подключена на следующем этапе.
         </p>
@@ -53,7 +53,7 @@ export function CheckoutForm() {
 
   return (
     <form
-      className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8"
+      className="grid gap-6 rounded-[1.75rem] border border-[#e5dbd6] bg-white p-6 sm:p-8"
       onSubmit={handleSubmit(() => setIsSubmitted(true))}
       noValidate
     >
@@ -114,7 +114,7 @@ export function CheckoutForm() {
         <input
           {...register("consent")}
           type="checkbox"
-          className="mt-1 size-4 rounded border-slate-300 accent-rose-600"
+          className="mt-1 size-4 rounded border-[#d1c4c9] accent-[#a42a4d]"
         />
         <span>
           Согласен на обработку данных для оформления демонстрационного заказа.
@@ -127,7 +127,7 @@ export function CheckoutForm() {
       </label>
       <button
         type="submit"
-        className="rounded-2xl bg-rose-600 px-6 py-4 font-bold text-white hover:bg-rose-700"
+        className="button-primary rounded-2xl"
       >
         Проверить оформление
       </button>
@@ -145,7 +145,7 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-slate-800">
+    <label className="grid gap-2 text-sm font-bold text-[#453740]">
       {label}
       {children}
       {error ? (

@@ -6,8 +6,14 @@ export default function StoreLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
+      <a
+        href="#main-content"
+        className="fixed left-4 top-4 z-[100] -translate-y-24 rounded-full bg-[#281d28] px-5 py-3 text-sm font-bold text-white transition focus:translate-y-0"
+      >
+        Перейти к содержимому
+      </a>
       <SiteHeader />
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
       <SiteFooter />
     </>
   );

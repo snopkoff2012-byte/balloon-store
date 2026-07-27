@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Manrope, Prata } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin", "cyrillic"],
+});
+
+const prata = Prata({
+  variable: "--font-prata",
+  subsets: ["latin", "cyrillic"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -28,8 +34,8 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/social-preview.png",
-        width: 1729,
+        url: "/og.png",
+        width: 1728,
         height: 911,
         alt: "Воздушная Москва — шары с доставкой",
       },
@@ -37,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/social-preview.png"],
+    images: ["/og.png"],
   },
 };
 
@@ -48,7 +54,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className={`${geistSans.variable} antialiased`}>{children}</body>
+      <body className={`${manrope.variable} ${prata.variable} antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }

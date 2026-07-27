@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { BalloonPhotoPlaceholder } from "@/components/ui/balloon-photo-placeholder";
 import { getProductById } from "@/data/catalog";
 import { formatMoney } from "@/lib/money";
 import { useHydrated } from "@/lib/use-hydrated";
@@ -14,7 +15,7 @@ export function CartView() {
 
   if (!isMounted) {
     return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 text-slate-500">
+      <div className="rounded-[1.75rem] border border-[#e5dbd6] bg-white p-8 text-[#82747c]">
         Загружаем корзину…
       </div>
     );
@@ -27,20 +28,21 @@ export function CartView() {
 
   if (cartLines.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-rose-200 bg-white p-10 text-center">
-        <p className="text-5xl" aria-hidden="true">
-          🛍️
-        </p>
-        <h2 className="mt-5 text-2xl font-bold text-slate-950">
+      <div className="rounded-[1.75rem] border border-dashed border-[#d9c7cd] bg-white p-10 text-center">
+        <span
+          className="mx-auto block h-12 w-12 rounded-full border-[10px] border-[#ead9df]"
+          aria-hidden="true"
+        />
+        <h2 className="mt-5 font-display text-2xl text-[#342831]">
           Корзина пока пуста
         </h2>
-        <p className="mx-auto mt-3 max-w-md text-slate-600">
+        <p className="mx-auto mt-3 max-w-md text-[#776a72]">
           Добавьте понравившийся набор из каталога — он сохранится на этом
           устройстве.
         </p>
         <Link
           href="/catalog"
-          className="mt-6 inline-flex rounded-full bg-rose-600 px-6 py-3 font-semibold text-white hover:bg-rose-700"
+          className="button-primary mt-6"
         >
           Перейти в каталог
         </Link>
@@ -60,22 +62,22 @@ export function CartView() {
         {cartLines.map(({ item, product }) => (
           <article
             key={item.variantId}
-            className="flex flex-col gap-5 rounded-3xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center"
+            className="flex flex-col gap-5 rounded-[1.75rem] border border-[#e5dbd6] bg-white p-5 sm:flex-row sm:items-center"
           >
-            <div
-              className={`flex size-28 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${product.accent} text-5xl`}
-              aria-hidden="true"
-            >
-              {product.emoji}
-            </div>
+            <BalloonPhotoPlaceholder
+              variant="product"
+              compact
+              className="size-28 shrink-0 rounded-2xl"
+              label={`Заглушка фотографии товара «${product.name}»`}
+            />
             <div className="min-w-0 flex-1">
               <Link
                 href={`/product/${product.slug}`}
-                className="text-lg font-bold text-slate-950 hover:text-rose-600"
+                className="text-lg font-extrabold text-[#342831] hover:text-[#8d2444]"
               >
                 {product.name}
               </Link>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-[#82747c]">
                 {formatMoney({
                   amountKopecks: product.priceKopecks,
                   currency: "RUB",
@@ -83,10 +85,10 @@ export function CartView() {
                 за набор
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center rounded-full border border-slate-200">
+                <div className="inline-flex items-center rounded-full border border-[#ddd1d6]">
                   <button
                     type="button"
-                    className="size-9 text-lg"
+                    className="size-9 text-lg transition hover:text-[#a42a4d] active:scale-90"
                     aria-label={`Уменьшить количество ${product.name}`}
                     onClick={() =>
                       updateQuantity(item.variantId, item.quantity - 1)
@@ -99,7 +101,7 @@ export function CartView() {
                   </span>
                   <button
                     type="button"
-                    className="size-9 text-lg"
+                    className="size-9 text-lg transition hover:text-[#a42a4d] active:scale-90"
                     aria-label={`Увеличить количество ${product.name}`}
                     onClick={() =>
                       updateQuantity(item.variantId, item.quantity + 1)
@@ -110,14 +112,14 @@ export function CartView() {
                 </div>
                 <button
                   type="button"
-                  className="text-sm font-medium text-slate-500 hover:text-rose-600"
+                  className="text-sm font-bold text-[#82747c] hover:text-[#8d2444]"
                   onClick={() => removeItem(item.variantId)}
                 >
                   Удалить
                 </button>
               </div>
             </div>
-            <p className="text-lg font-bold text-slate-950">
+            <p className="text-lg font-extrabold text-[#342831]">
               {formatMoney({
                 amountKopecks: product.priceKopecks * item.quantity,
                 currency: "RUB",
@@ -127,15 +129,15 @@ export function CartView() {
         ))}
       </div>
 
-      <aside className="h-fit rounded-3xl bg-slate-950 p-6 text-white lg:sticky lg:top-24">
-        <h2 className="text-xl font-bold">Ваш заказ</h2>
-        <div className="mt-6 flex justify-between text-sm text-slate-300">
+      <aside className="h-fit rounded-[1.75rem] bg-[#342631] p-6 text-white lg:sticky lg:top-28">
+        <h2 className="text-xl font-extrabold">Ваш заказ</h2>
+        <div className="mt-6 flex justify-between text-sm text-white/62">
           <span>Товары</span>
           <span>
             {formatMoney({ amountKopecks: itemsTotal, currency: "RUB" })}
           </span>
         </div>
-        <div className="mt-3 flex justify-between text-sm text-slate-300">
+        <div className="mt-3 flex justify-between text-sm text-white/62">
           <span>Доставка</span>
           <span>после подтверждения</span>
         </div>
@@ -147,7 +149,7 @@ export function CartView() {
         </div>
         <Link
           href="/checkout"
-          className="mt-6 flex justify-center rounded-2xl bg-rose-500 px-5 py-4 font-bold text-white hover:bg-rose-400"
+          className="button-light mt-6 flex rounded-2xl"
         >
           Перейти к оформлению
         </Link>

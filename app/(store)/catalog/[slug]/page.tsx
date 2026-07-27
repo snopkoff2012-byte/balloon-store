@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/catalog/product-card";
+import { BalloonPhotoPlaceholder } from "@/components/ui/balloon-photo-placeholder";
 import { Container } from "@/components/ui/container";
 import { PageHeading } from "@/components/ui/page-heading";
 import {
@@ -41,19 +42,26 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <Container className="py-12 sm:py-16">
-      <div className={`rounded-[2.5rem] bg-gradient-to-br ${category.accent} p-8 sm:p-12`}>
-        <Link href="/catalog" className="text-sm font-semibold text-slate-600 hover:text-rose-700">
+      <div className="overflow-hidden rounded-[2rem] bg-[#f1ebe6] sm:rounded-[2.5rem]">
+        <div className="grid items-stretch sm:grid-cols-[1fr_260px]">
+          <div className="p-7 sm:p-12">
+        <Link href="/catalog" className="text-sm font-bold text-[#7e6f78] hover:text-[#8d2444]">
           ← Вернуться в каталог
         </Link>
-        <div className="mt-8 grid items-center gap-8 sm:grid-cols-[1fr_auto]">
+        <div className="mt-8">
           <PageHeading
             eyebrow="Категория"
             title={category.name}
             description={category.description}
           />
-          <span className="text-8xl" aria-hidden="true">
-            {category.emoji}
-          </span>
+        </div>
+          </div>
+          <BalloonPhotoPlaceholder
+            variant="product"
+            compact
+            className="min-h-64 sm:min-h-full"
+            label={`Заглушка фотографии категории «${category.name}»`}
+          />
         </div>
       </div>
       {categoryProducts.length > 0 ? (
