@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { createOrderSchema, orderResultSchema } from "@/features/checkout/order-schema";
+import { getOrderNotifier } from "@/features/notifications/order-notifier";
 import { getOptionalPublicEnvironment } from "@/lib/environment";
 
 export async function POST(request: Request) {
@@ -31,12 +32,27 @@ export async function POST(request: Request) {
     order_input: {
       customer_name: payload.data.name,
       customer_phone: payload.data.phone,
+      contact_method: payload.data.contactMethod,
       customer_email: payload.data.email || null,
+      recipient_is_different: payload.data.recipientIsDifferent,
+      recipient_name: payload.data.recipientName || null,
+      recipient_phone: payload.data.recipientPhone || null,
       city: payload.data.city,
       address: payload.data.address,
+      apartment_office: payload.data.apartmentOffice,
+      entrance: payload.data.entrance,
+      floor: payload.data.floor,
+      intercom: payload.data.intercom,
       requested_delivery_date: payload.data.date,
       requested_delivery_slot: payload.data.interval,
       comment: payload.data.comment,
+      card_enabled: payload.data.cardEnabled,
+      card_text: payload.data.cardText,
+      fulfillment_method: payload.data.fulfillmentMethod,
+      urgent_delivery: payload.data.urgentDelivery,
+      payment_method: payload.data.paymentMethod,
+      website: payload.data.website,
+      submitted_at: payload.data.submittedAt,
       idempotency_key: payload.data.idempotencyKey,
       items: payload.data.items.map((item) => ({
         product_id: item.productId,
@@ -66,6 +82,16 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+
+  // Уведомление не влияет на факт оформления: провайдер можно подключить
+  // позднее, не раскрывая контактные данные клиента внешнему сервису.
+  void getOrderNotifier()
+    .notifyNewOrder({
+      orderNumber: result.data.order_number,
+      totalKopecks: result.data.total_kopecks,
+      fulfillmentMethod: payload.data.fulfillmentMethod,
+    })
+    .catch(() => undefined);
 
   return NextResponse.json(result.data, { status: 201 });
 }

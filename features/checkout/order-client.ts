@@ -1,28 +1,15 @@
 "use client";
 
 import type { CartItem } from "@/features/cart/types";
-import { createOrderSchema, orderResultSchema, type OrderResult } from "./order-schema";
-
-type CustomerDetails = {
-  name: string;
-  phone: string;
-  email?: string;
-  city: string;
-  address: string;
-  date: string;
-  interval: string;
-  comment?: string;
-};
+import { createOrderSchema, orderResultSchema, type CheckoutDetails, type OrderResult } from "./order-schema";
 
 export async function createOrder(
-  customer: CustomerDetails,
+  customer: CheckoutDetails,
   items: CartItem[],
   idempotencyKey: string,
 ): Promise<OrderResult> {
   const payload = createOrderSchema.parse({
     ...customer,
-    email: customer.email ?? "",
-    comment: customer.comment ?? "",
     idempotencyKey,
     items: items.map((item) => ({
       productId: item.productId,

@@ -15,9 +15,10 @@ type OrderFormValues = z.input<typeof orderUpdateSchema>;
 const orderStatusLabels: Record<AdminOrder["status"], string> = {
   new: "Новый",
   confirmed: "Подтверждён",
-  assembling: "Собирается",
-  ready: "Готов",
-  out_for_delivery: "Передан курьеру",
+  awaiting_payment: "Ожидает оплаты",
+  paid: "Оплачен",
+  preparing: "Готовится",
+  handed_to_courier: "Передан курьеру",
   completed: "Завершён",
   cancelled: "Отменён",
 };

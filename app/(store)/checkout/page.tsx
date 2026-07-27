@@ -14,7 +14,7 @@ export default function CheckoutPage() {
       <PageHeading
         eyebrow="Без регистрации"
         title="Оформление заказа"
-        description="Укажите контакты и удобное время. На этом этапе форма работает с тестовыми данными и ничего не отправляет."
+        description="Укажите контакты и удобное время. Заказ создаётся на сервере после повторной проверки состава корзины и цены."
       />
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <CheckoutForm />

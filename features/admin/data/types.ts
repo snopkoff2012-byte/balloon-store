@@ -1,9 +1,10 @@
 export type OrderStatus =
   | "new"
   | "confirmed"
-  | "assembling"
-  | "ready"
-  | "out_for_delivery"
+  | "awaiting_payment"
+  | "paid"
+  | "preparing"
+  | "handed_to_courier"
   | "completed"
   | "cancelled";
 
