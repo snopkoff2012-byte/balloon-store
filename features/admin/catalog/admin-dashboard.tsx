@@ -8,6 +8,7 @@ export function AdminDashboard() {
   const hydrated = useHydrated();
   const categories = useCatalogStore((state) => state.categories);
   const products = useCatalogStore((state) => state.products);
+  const source = useCatalogStore((state) => state.source);
   const resetCatalog = useCatalogStore((state) => state.resetCatalog);
 
   const stats = [
@@ -22,13 +23,13 @@ export function AdminDashboard() {
     },
   ];
 
-  function handleReset() {
+  async function handleReset() {
     if (
       window.confirm(
         "Сбросить все локальные изменения и вернуть исходные 20 товаров?",
       )
     ) {
-      resetCatalog();
+      await resetCatalog();
     }
   }
 
@@ -86,13 +87,15 @@ export function AdminDashboard() {
             </span>
           </Link>
         </div>
-        <button
-          type="button"
-          onClick={handleReset}
-          className="mt-6 rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700 hover:border-rose-400 hover:text-rose-700"
-        >
-          Вернуть исходные тестовые данные
-        </button>
+        {source === "fallback" ? (
+          <button
+            type="button"
+            onClick={handleReset}
+            className="mt-6 rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700 hover:border-rose-400 hover:text-rose-700"
+          >
+            Вернуть исходные тестовые данные
+          </button>
+        ) : null}
       </section>
     </>
   );

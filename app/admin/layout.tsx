@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import { AdminSignOut } from "@/features/admin/auth/admin-sign-out";
+import { getOptionalPublicEnvironment } from "@/lib/environment";
 
 export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const isSupabaseConfigured = Boolean(getOptionalPublicEnvironment());
+
   return (
     <div className="min-h-screen bg-slate-100">
       <header className="border-b border-slate-800 bg-slate-950 text-white">
@@ -21,12 +25,15 @@ export default function AdminLayout({
               </Link>
             </nav>
           </div>
-          <Link
-            href="/"
-            className="text-sm font-medium text-slate-300 hover:text-white"
-          >
-            Вернуться в магазин
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-sm font-medium text-slate-300 hover:text-white"
+            >
+              Вернуться в магазин
+            </Link>
+            {isSupabaseConfigured ? <AdminSignOut /> : null}
+          </div>
         </Container>
       </header>
       <main>

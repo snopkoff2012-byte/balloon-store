@@ -23,6 +23,26 @@ export function getPublicEnvironment() {
   return publicEnvironmentSchema.parse(readPublicEnvironment());
 }
 
+export function getOptionalPublicEnvironment() {
+  const parsed = publicEnvironmentSchema.safeParse(readPublicEnvironment());
+  if (!parsed.success) {
+    return null;
+  }
+
+  if (
+    parsed.data.NEXT_PUBLIC_SUPABASE_URL.includes("your-project") ||
+    parsed.data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.startsWith("your-")
+  ) {
+    return null;
+  }
+
+  return parsed.data;
+}
+
+export function isSupabaseConfigured() {
+  return getOptionalPublicEnvironment() !== null;
+}
+
 export function getServerEnvironment() {
   return serverEnvironmentSchema.parse({
     ...readPublicEnvironment(),

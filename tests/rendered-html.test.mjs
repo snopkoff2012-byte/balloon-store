@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
+
+// Маршрутные тесты не зависят от внешней сети и проверяют аварийный каталог.
+// Реальный Supabase отдельно проверяется интеграционными запросами перед релизом.
+process.env.NEXT_PUBLIC_SUPABASE_URL = "";
+process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "";
+process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
 
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
@@ -11,6 +18,9 @@ async function render(pathname) {
       headers: { accept: "text/html" },
     }),
     {
+      NEXT_PUBLIC_SUPABASE_URL: "https://your-project.supabase.co",
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "your-publishable-key",
+      NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
       ASSETS: {
         fetch: async () => new Response("Not found", { status: 404 }),
       },
@@ -31,9 +41,7 @@ const routes = [
   ["/checkout", "Оформление заказа"],
   ["/delivery", "Доставка и оплата"],
   ["/contacts", "Контакты"],
-  ["/admin", "Управление каталогом"],
-  ["/admin/categories", "Категории — управление"],
-  ["/admin/products", "Товары — управление"],
+  ["/admin/login", "Вход администратора"],
 ];
 
 for (const [pathname, expectedText] of routes) {
@@ -42,6 +50,18 @@ for (const [pathname, expectedText] of routes) {
     assert.equal(response.status, 200);
     assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
     assert.match(await response.text(), new RegExp(expectedText, "i"));
+  });
+}
+
+for (const pathname of ["/admin", "/admin/categories", "/admin/products"]) {
+  test(`protects ${pathname}`, async () => {
+    const response = await render(pathname);
+    assert.equal(response.status, 307);
+    assert.equal(
+      new URL(response.headers.get("location") ?? "", "http://localhost")
+        .pathname,
+      "/admin/login",
+    );
   });
 }
 
@@ -65,4 +85,50 @@ test("does not expose the disposable starter preview", async () => {
   assert.match(html, /Вопросы и ответы/i);
   assert.match(html, /Telegram/i);
   assert.match(html, /WhatsApp/i);
+});
+
+test("contains the required Supabase schema and seed catalog", async () => {
+  const migration = await readFile(
+    new URL(
+      "../supabase/migrations/20260727133000_initial_store_schema.sql",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  const seed = await readFile(
+    new URL("../supabase/seed.sql", import.meta.url),
+    "utf8",
+  );
+
+  for (const table of [
+    "categories",
+    "products",
+    "product_images",
+    "product_categories",
+    "product_options",
+    "product_option_values",
+    "orders",
+    "order_items",
+    "customers",
+    "delivery_zones",
+    "promo_codes",
+    "site_settings",
+    "constructor_items",
+  ]) {
+    assert.match(migration, new RegExp(`create table public\\.${table}\\b`));
+    assert.match(
+      migration,
+      new RegExp(`alter table public\\.${table} enable row level security`),
+    );
+  }
+
+  assert.match(migration, /catalog-images/);
+  assert.equal(
+    seed.match(/insert into public\.products \(/g)?.length,
+    20,
+  );
+  assert.equal(
+    seed.match(/insert into public\.categories \(/g)?.length,
+    8,
+  );
 });

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { StorageImageUploader } from "@/features/admin/storage/storage-image-uploader";
 import { categoryFormSchema } from "@/features/catalog/schemas";
 import { useCatalogStore } from "@/features/catalog/store";
 import type { Category } from "@/features/catalog/types";
@@ -24,8 +25,8 @@ const emptyForm: CategoryFormValues = {
   seoDescription: "",
 };
 
-function createId(prefix: string) {
-  return `${prefix}-${globalThis.crypto?.randomUUID?.() ?? Date.now()}`;
+function createId() {
+  return crypto.randomUUID();
 }
 
 export function CategoryManager() {
@@ -40,6 +41,7 @@ export function CategoryManager() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
@@ -74,7 +76,7 @@ export function CategoryManager() {
     setNotice("");
   }
 
-  function onSubmit(values: CategoryFormValues) {
+  async function onSubmit(values: CategoryFormValues) {
     const parsed = categoryFormSchema.parse(values);
     const duplicateSlug = categories.some(
       (category) =>
@@ -91,19 +93,25 @@ export function CategoryManager() {
 
     const current = categories.find((category) => category.id === editingId);
     const now = new Date().toISOString();
-    saveCategory({
-      id: current?.id ?? createId("category"),
-      ...parsed,
-      parentId: parsed.parentId || null,
-      createdAt: current?.createdAt ?? now,
-      updatedAt: now,
-    });
-    setNotice(current ? "Категория обновлена." : "Категория добавлена.");
-    setEditingId(null);
-    reset(emptyForm);
+    try {
+      await saveCategory({
+        id: current?.id ?? createId(),
+        ...parsed,
+        parentId: parsed.parentId || null,
+        createdAt: current?.createdAt ?? now,
+        updatedAt: now,
+      });
+      setNotice(current ? "Категория обновлена." : "Категория добавлена.");
+      setEditingId(null);
+      reset(emptyForm);
+    } catch {
+      setNotice(
+        "Не удалось сохранить категорию. Проверьте вход администратора и соединение.",
+      );
+    }
   }
 
-  function handleDelete(category: Category) {
+  async function handleDelete(category: Category) {
     const hasChildren = categories.some(
       (item) => item.parentId === category.id,
     );
@@ -117,17 +125,29 @@ export function CategoryManager() {
       return;
     }
     if (window.confirm(`Удалить категорию «${category.name}»?`)) {
-      deleteCategory(category.id);
+      try {
+        await deleteCategory(category.id);
+      } catch {
+        setNotice(
+          "Не удалось удалить категорию. Возможно, она используется или нет прав администратора.",
+        );
+      }
     }
   }
 
-  function toggleVisibility(category: Category) {
-    saveCategory({
-      ...category,
-      publicationStatus:
-        category.publicationStatus === "published" ? "hidden" : "published",
-      updatedAt: new Date().toISOString(),
-    });
+  async function toggleVisibility(category: Category) {
+    try {
+      await saveCategory({
+        ...category,
+        publicationStatus:
+          category.publicationStatus === "published" ? "hidden" : "published",
+        updatedAt: new Date().toISOString(),
+      });
+    } catch {
+      setNotice(
+        "Не удалось изменить публикацию. Проверьте вход администратора и соединение.",
+      );
+    }
   }
 
   if (!hydrated) {
@@ -167,8 +187,14 @@ export function CategoryManager() {
           <AdminField label="Полное описание">
             <textarea {...register("fullDescription")} className="admin-input min-h-28" />
           </AdminField>
-          <AdminField label="Локальный путь изображения">
+          <AdminField label="Изображение категории">
             <input {...register("image")} className="admin-input" />
+            <StorageImageUploader
+              folder="categories"
+              onUploaded={([image]) => {
+                if (image) setValue("image", image.url, { shouldDirty: true });
+              }}
+            />
           </AdminField>
           <div className="grid grid-cols-2 gap-3">
             <AdminField label="Родитель">

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { StorageImageUploader } from "@/features/admin/storage/storage-image-uploader";
 import { productFormSchema } from "@/features/catalog/schemas";
 import { useCatalogStore } from "@/features/catalog/store";
 import type {
@@ -43,13 +44,13 @@ const emptyForm: ProductFormValues = {
   publicationStatus: "draft",
 };
 
-function createId(prefix: string) {
-  return `${prefix}-${globalThis.crypto?.randomUUID?.() ?? Date.now()}`;
+function createId() {
+  return crypto.randomUUID();
 }
 
 const defaultImages = (): ProductImage[] => [
   {
-    id: createId("image"),
+    id: createId(),
     src: "/og.png",
     alt: "Фотография товара",
     sortOrder: 0,
@@ -169,7 +170,7 @@ export function ProductManager() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function onSubmit(values: ProductFormValues) {
+  async function onSubmit(values: ProductFormValues) {
     const parsed = productFormSchema.parse(values);
     if (
       products.some(
@@ -204,11 +205,11 @@ export function ProductManager() {
           }));
     const current = products.find((product) => product.id === editingId);
     const now = new Date().toISOString();
-    const id = current?.id ?? createId("product");
+    const id = current?.id ?? createId();
     const stockQuantity =
       parsed.stockQuantity === "" ? null : parsed.stockQuantity;
 
-    saveProduct({
+    const productToSave: Product = {
       id,
       name: parsed.name,
       slug: parsed.slug,
@@ -237,7 +238,7 @@ export function ProductManager() {
       options,
       variants: [
         {
-          id: current?.variants[0]?.id ?? `${id}-variant-default`,
+          id: current?.variants[0]?.id ?? createId(),
           sku: parsed.sku,
           optionValueIds: options.flatMap((option) =>
             option.values[0] ? [option.values[0].id] : [],
@@ -254,31 +255,51 @@ export function ProductManager() {
       publicationStatus: parsed.publicationStatus,
       createdAt: current?.createdAt ?? now,
       updatedAt: now,
-    });
-    setNotice(current ? "Товар обновлён." : "Товар добавлен.");
-    setEditingId(null);
-    reset(emptyForm);
-    setImages(defaultImages());
-    setOptions([]);
-    setAttributes([]);
+    };
+
+    try {
+      await saveProduct(productToSave);
+      setNotice(current ? "Товар обновлён." : "Товар добавлен.");
+      setEditingId(null);
+      reset(emptyForm);
+      setImages(defaultImages());
+      setOptions([]);
+      setAttributes([]);
+    } catch {
+      setNotice(
+        "Не удалось сохранить товар. Проверьте вход администратора и соединение.",
+      );
+    }
   }
 
-  function toggleVisibility(product: Product) {
-    saveProduct({
-      ...product,
-      publicationStatus:
-        product.publicationStatus === "published" ? "hidden" : "published",
-      updatedAt: new Date().toISOString(),
-    });
+  async function toggleVisibility(product: Product) {
+    try {
+      await saveProduct({
+        ...product,
+        publicationStatus:
+          product.publicationStatus === "published" ? "hidden" : "published",
+        updatedAt: new Date().toISOString(),
+      });
+    } catch {
+      setNotice(
+        "Не удалось изменить публикацию. Проверьте вход администратора и соединение.",
+      );
+    }
   }
 
-  function handleDelete(product: Product) {
+  async function handleDelete(product: Product) {
     if (
       window.confirm(
         `Удалить тестовый товар «${product.name}»? В реальной базе товары из заказов будут только архивироваться.`,
       )
     ) {
-      deleteProduct(product.id);
+      try {
+        await deleteProduct(product.id);
+      } catch {
+        setNotice(
+          "Не удалось удалить товар. Проверьте вход администратора и связанные заказы.",
+        );
+      }
     }
   }
 
@@ -620,6 +641,22 @@ function ImageEditor({
 
   return (
     <AdminSection title="Фотографии">
+      <StorageImageUploader
+        folder="products"
+        multiple
+        onUploaded={(uploaded) =>
+          onChange([
+            ...images,
+            ...uploaded.map((image, index) => ({
+              id: createId(),
+              src: image.url,
+              alt: image.name.replace(/\.[^.]+$/, ""),
+              sortOrder: images.length + index,
+              isPrimary: images.length === 0 && index === 0,
+            })),
+          ])
+        }
+      />
       {images.map((image, index) => (
         <div key={image.id} className="grid gap-2 rounded-xl bg-slate-50 p-3">
           <input
@@ -679,7 +716,7 @@ function ImageEditor({
           onChange([
             ...images,
             {
-              id: createId("image"),
+              id: createId(),
               src: "/social-preview.png",
               alt: "Дополнительная фотография",
               sortOrder: images.length,
@@ -807,7 +844,7 @@ function OptionEditor({
                   values: [
                     ...option.values,
                     {
-                      id: createId("option-value"),
+                      id: createId(),
                       label: "Новое значение",
                       value: `value-${option.values.length + 1}`,
                       priceModifierKopecks: 0,
@@ -838,7 +875,7 @@ function OptionEditor({
           onChange([
             ...options,
             {
-              id: createId("option"),
+              id: createId(),
               code: `option_${options.length + 1}`,
               name: "Новая опция",
               type: "select",
@@ -949,7 +986,7 @@ function AttributeEditor({
           onChange([
             ...attributes,
             {
-              id: createId("attribute"),
+              id: createId(),
               code: `attribute_${attributes.length + 1}`,
               name: "Новая характеристика",
               type: "text",
