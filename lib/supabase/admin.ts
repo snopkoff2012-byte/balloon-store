@@ -6,7 +6,7 @@ import { createServerSupabaseClient } from "./server";
 
 export async function requireActiveAdmin() {
   if (!getOptionalPublicEnvironment()) {
-    return { mode: "fallback" as const, profile: null };
+    redirect("/admin/login?error=configuration");
   }
 
   const supabase = await createServerSupabaseClient();

@@ -53,7 +53,15 @@ for (const [pathname, expectedText] of routes) {
   });
 }
 
-for (const pathname of ["/admin", "/admin/categories", "/admin/products"]) {
+for (const pathname of [
+  "/admin",
+  "/admin/categories",
+  "/admin/products",
+  "/admin/orders",
+  "/admin/delivery",
+  "/admin/promos",
+  "/admin/settings",
+]) {
   test(`protects ${pathname}`, async () => {
     const response = await render(pathname);
     assert.equal(response.status, 307);
@@ -131,4 +139,29 @@ test("contains the required Supabase schema and seed catalog", async () => {
     seed.match(/insert into public\.categories \(/g)?.length,
     8,
   );
+});
+
+test("contains secure admin panel migration and owner guide", async () => {
+  const migration = await readFile(
+    new URL(
+      "../supabase/migrations/20260727183000_secure_admin_panel.sql",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  const guide = await readFile(
+    new URL("../docs/ADMIN_GUIDE.md", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(migration, /create table if not exists public\.order_status_history/);
+  assert.match(migration, /create table if not exists public\.admin_audit_log/);
+  assert.match(migration, /create or replace function public\.is_store_owner/);
+  assert.match(migration, /drop policy if exists "active_admin_manage_admin_profiles"/);
+  assert.match(guide, /Как войти/);
+  assert.match(guide, /Как добавить категорию/);
+  assert.match(guide, /Как добавить товар/);
+  assert.match(guide, /Как изменить цену/);
+  assert.match(guide, /Как скрыть товар/);
+  assert.match(guide, /Как посмотреть заказ/);
 });

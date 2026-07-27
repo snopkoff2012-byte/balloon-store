@@ -325,62 +325,133 @@ for (const product of rawCatalog.products) {
 }
 
 const deliveryZones = [
-  ["moscow-center", "Москва в пределах МКАД", 79000, 0, 1500000, 10],
-  ["moscow-near", "До 20 км от МКАД", 99000, 5000, 2000000, 20],
-  ["moscow-region", "Московская область", 149000, 7000, null, 30],
+  [
+    "moscow-center",
+    "Москва в пределах МКАД",
+    "Доставка по Москве в пределах МКАД.",
+    79000,
+    0,
+    1500000,
+    300000,
+    70000,
+    ["10:00–13:00", "13:00–16:00", "16:00–19:00", "19:00–22:00"],
+    10,
+  ],
+  [
+    "moscow-near",
+    "До 20 км от МКАД",
+    "Ближнее Подмосковье до 20 км от МКАД.",
+    99000,
+    5000,
+    2000000,
+    500000,
+    90000,
+    ["10:00–14:00", "14:00–18:00", "18:00–22:00"],
+    20,
+  ],
+  [
+    "moscow-region",
+    "Московская область",
+    "Дальние районы Московской области, стоимость уточняет менеджер.",
+    149000,
+    7000,
+    null,
+    700000,
+    120000,
+    ["10:00–15:00", "15:00–20:00"],
+    30,
+  ],
 ];
 
-for (const [slug, name, base, perKm, freeFrom, order] of deliveryZones) {
+for (const [
+  slug,
+  name,
+  description,
+  base,
+  perKm,
+  freeFrom,
+  minimumOrder,
+  urgentSurcharge,
+  intervals,
+  order,
+] of deliveryZones) {
   lines.push(
     `insert into public.delivery_zones (` +
       `id, name, slug, description, base_price_kopecks, price_per_km_kopecks, ` +
-      `free_from_kopecks, is_active, sort_order` +
+      `free_from_kopecks, minimum_order_kopecks, urgent_surcharge_kopecks, ` +
+      `delivery_intervals, is_active, sort_order` +
       `) values (` +
       [
         sqlString(uuid(`delivery-${slug}`)),
         sqlString(name),
         sqlString(slug),
-        sqlString("Тестовая зона доставки для демонстрационной версии."),
+        sqlString(description),
         base,
         perKm,
         freeFrom ?? "null",
+        minimumOrder,
+        urgentSurcharge,
+        sqlJson(intervals),
         "true",
         order,
       ].join(", ") +
       `) on conflict (id) do update set ` +
-      `name = excluded.name, base_price_kopecks = excluded.base_price_kopecks, ` +
+      `name = excluded.name, description = excluded.description, ` +
+      `base_price_kopecks = excluded.base_price_kopecks, ` +
       `price_per_km_kopecks = excluded.price_per_km_kopecks, ` +
-      `free_from_kopecks = excluded.free_from_kopecks, is_active = excluded.is_active;`,
+      `free_from_kopecks = excluded.free_from_kopecks, ` +
+      `minimum_order_kopecks = excluded.minimum_order_kopecks, ` +
+      `urgent_surcharge_kopecks = excluded.urgent_surcharge_kopecks, ` +
+      `delivery_intervals = excluded.delivery_intervals, ` +
+      `is_active = excluded.is_active;`,
   );
 }
 
 lines.push(
   "",
   `insert into public.promo_codes (` +
-    `id, code, discount_type, discount_value, minimum_order_kopecks, ` +
-    `maximum_discount_kopecks, is_active` +
+    `id, code, description, discount_type, discount_value, minimum_order_kopecks, ` +
+    `maximum_discount_kopecks, per_customer_limit, usage_limit, is_active` +
     `) values (` +
     [
       sqlString(uuid("promo-welcome10")),
       sqlString("WELCOME10"),
+      sqlString("Скидка 10% на первый заказ"),
       sqlString("percent"),
       10,
       500000,
       150000,
+      1,
+      100,
       "true",
     ].join(", ") +
-    `) on conflict (id) do update set is_active = excluded.is_active;`,
+    `) on conflict (id) do update set description = excluded.description, ` +
+    `minimum_order_kopecks = excluded.minimum_order_kopecks, ` +
+    `maximum_discount_kopecks = excluded.maximum_discount_kopecks, ` +
+    `per_customer_limit = excluded.per_customer_limit, ` +
+    `usage_limit = excluded.usage_limit, is_active = excluded.is_active;`,
   "",
   `insert into public.site_settings (key, value, description) values`,
   `  ('store.contacts', ${sqlJson({
     phone: "+7 (495) 000-00-00",
     email: "hello@example.ru",
     telegram: "balloon_moscow_demo",
-  })}, 'Тестовые контакты магазина'),`,
+    whatsapp: "+7 900 000-00-00",
+    address: "Москва, Большая Никитская улица, 24",
+  })}, 'Контакты магазина'),`,
   `  ('store.working_hours', ${sqlJson({
     timezone: "Europe/Moscow",
     daily: "09:00–21:00",
-  })}, 'Режим работы')`,
+  })}, 'Режим работы'),`,
+  `  ('store.checkout', ${sqlJson({
+    minimumOrderRub: 3000,
+  })}, 'Ограничения оформления заказа'),`,
+  `  ('home.hero', ${sqlJson({
+    eyebrow: "Доставим праздник сегодня",
+    title: "Воздушные шары с настроением",
+    description:
+      "Соберём композицию под ваш повод и аккуратно привезём по Москве и области.",
+  })}, 'Тексты первого экрана')`,
   `on conflict (key) do update set value = excluded.value, description = excluded.description;`,
   "",
 );
@@ -432,9 +503,10 @@ lines.push(
   "",
   `insert into public.orders (` +
     `id, public_token, customer_id, status, customer_name, customer_phone, ` +
-    `customer_email, comment, delivery_address, delivery_zone_id, ` +
+    `customer_email, comment, manager_comment, delivery_address, delivery_zone_id, ` +
     `requested_delivery_date, requested_delivery_slot, items_total_kopecks, ` +
-    `discount_kopecks, delivery_kopecks, total_kopecks, currency, idempotency_key` +
+    `discount_kopecks, delivery_kopecks, total_kopecks, currency, payment_status, ` +
+    `payment_method, delivery_status, urgent_delivery, idempotency_key` +
     `) values (` +
     [
       sqlString(orderId),
@@ -444,19 +516,33 @@ lines.push(
       sqlString("Тестовый покупатель"),
       sqlString("+7 900 000-00-00"),
       sqlString("buyer@example.ru"),
-      sqlString("Тестовый заказ из seed.sql"),
-      sqlJson({ city: "Москва", street: "Тестовая улица", house: "1" }),
+      sqlString("Позвонить за час до доставки"),
+      sqlString("Уточнить цвет лент"),
+      sqlJson({
+        city: "Москва",
+        street: "Тестовая улица",
+        house: "1",
+        apartment: "12",
+      }),
       sqlString(uuid("delivery-moscow-center")),
       sqlString("2026-08-15"),
-      sqlString("12:00–15:00"),
+      sqlString("13:00–16:00"),
       orderProduct.salePriceKopecks,
       0,
       79000,
       orderProduct.salePriceKopecks + 79000,
       sqlString("RUB"),
+      sqlString("awaiting"),
+      sqlString("on_confirmation"),
+      sqlString("not_scheduled"),
+      "false",
       sqlString("seed-order-demo"),
     ].join(", ") +
-    `) on conflict (id) do update set status = excluded.status, updated_at = timezone('utc', now());`,
+    `) on conflict (id) do update set status = excluded.status, ` +
+    `manager_comment = excluded.manager_comment, ` +
+    `payment_status = excluded.payment_status, ` +
+    `delivery_status = excluded.delivery_status, ` +
+    `updated_at = timezone('utc', now());`,
   "",
   `insert into public.order_items (` +
     `id, order_id, product_id, variant_id, quantity, unit_price_kopecks, ` +
@@ -480,7 +566,6 @@ lines.push(
     `) on conflict (id) do update set product_snapshot = excluded.product_snapshot;`,
   "",
   "commit;",
-  "",
 );
 
 await writeFile(

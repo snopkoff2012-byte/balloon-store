@@ -3,6 +3,9 @@
 Интернет-магазин воздушных шаров для Москвы и Московской области на Next.js,
 TypeScript, Tailwind CSS и Supabase.
 
+Пошаговая инструкция для владельца магазина находится в
+[`docs/ADMIN_GUIDE.md`](docs/ADMIN_GUIDE.md).
+
 Каталог загружается из PostgreSQL в Supabase. Авторизация административной
 панели работает через Supabase Auth, а фотографии загружаются в Supabase
 Storage. Если база временно недоступна, публичная часть не падает: посетитель
@@ -82,6 +85,8 @@ npm run dev
   Storage;
 - `migrations/20260727164500_protect_product_cost_price.sql` — отдельная защита
   себестоимости;
+- `migrations/20260727183000_secure_admin_panel.sql` — заказы, история
+  статусов, аудит, доставка и усиление прав административных ролей;
 - `seed.sql` — воспроизводимые тестовые данные;
 - `config.toml` — конфигурация Supabase CLI.
 
@@ -134,6 +139,10 @@ node scripts/generate-supabase-seed.mjs
 | Административная панель | `/admin` |
 | Категории | `/admin/categories` |
 | Товары | `/admin/products` |
+| Заказы | `/admin/orders` |
+| Доставка | `/admin/delivery` |
+| Промокоды | `/admin/promos` |
+| Настройки сайта | `/admin/settings` |
 
 ## Проверка проекта
 

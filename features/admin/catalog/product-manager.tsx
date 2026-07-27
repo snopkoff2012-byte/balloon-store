@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -13,6 +14,7 @@ import type {
   ProductImage,
   ProductOption,
   ProductOptionValue,
+  ProductVariant,
 } from "@/features/catalog/types";
 import { formatMoney } from "@/lib/money";
 import { useHydrated } from "@/lib/use-hydrated";
@@ -92,9 +94,15 @@ export function ProductManager() {
   const deleteProduct = useCatalogStore((state) => state.deleteProduct);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+  const [showPreview, setShowPreview] = useState(false);
   const [notice, setNotice] = useState("");
+  const [noticeTone, setNoticeTone] = useState<"success" | "error">("success");
   const [images, setImages] = useState<ProductImage[]>(defaultImages);
   const [options, setOptions] = useState<ProductOption[]>([]);
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
   const [attributes, setAttributes] = useState<DraftAttribute[]>([]);
   const {
     register,
@@ -110,26 +118,50 @@ export function ProductManager() {
 
   const selectedCategoryIds =
     useWatch({ control, name: "categoryIds" }) ?? [];
+  const previewValues = useWatch({ control });
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase("ru");
     return [...products]
-      .filter((product) =>
-        normalized
+      .filter((product) => {
+        const matchesQuery = normalized
           ? `${product.name} ${product.sku} ${product.slug}`
               .toLocaleLowerCase("ru")
               .includes(normalized)
-          : true,
-      )
+          : true;
+        const matchesCategory =
+          categoryFilter === "all" ||
+          product.categoryIds.includes(categoryFilter);
+        const matchesStatus =
+          statusFilter === "all" ||
+          product.publicationStatus === statusFilter;
+        const matchesAvailability =
+          availabilityFilter === "all" ||
+          product.availabilityStatus === availabilityFilter;
+        return (
+          matchesQuery &&
+          matchesCategory &&
+          matchesStatus &&
+          matchesAvailability
+        );
+      })
       .sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [products, query]);
+  }, [
+    availabilityFilter,
+    categoryFilter,
+    products,
+    query,
+    statusFilter,
+  ]);
 
   function startCreate() {
     setEditingId(null);
     reset(emptyForm);
     setImages(defaultImages());
     setOptions([]);
+    setVariants([]);
     setAttributes([]);
     setNotice("");
+    setShowPreview(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -165,8 +197,76 @@ export function ProductManager() {
     });
     setImages(product.images);
     setOptions(product.options);
+    setVariants(product.variants);
     setAttributes(attributesToDraft(product.attributes));
     setNotice("");
+    setShowPreview(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function startDuplicate(product: Product) {
+    const valueIdMap = new Map<string, string>();
+    const duplicatedOptions = product.options.map((option) => ({
+      ...option,
+      id: createId(),
+      values: option.values.map((value) => {
+        const id = createId();
+        valueIdMap.set(value.id, id);
+        return { ...value, id };
+      }),
+    }));
+    setEditingId(null);
+    reset({
+      name: `${product.name} — копия`,
+      slug: `${product.slug}-copy`,
+      sku: `${product.sku}-COPY`,
+      shortDescription: product.shortDescription,
+      fullDescription: product.fullDescription,
+      regularPriceRub: product.regularPriceKopecks / 100,
+      salePriceRub:
+        product.salePriceKopecks === null
+          ? ""
+          : product.salePriceKopecks / 100,
+      costPriceRub:
+        product.costPriceKopecks === null
+          ? ""
+          : product.costPriceKopecks / 100,
+      primaryCategoryId: product.primaryCategoryId,
+      categoryIds: product.categoryIds,
+      stockQuantity: product.stockQuantity ?? "",
+      availabilityStatus: product.availabilityStatus,
+      isMadeToOrder: product.isMadeToOrder,
+      isBestseller: false,
+      isNew: true,
+      isRecommended: product.isRecommended,
+      sortOrder: product.sortOrder + 1,
+      seoTitle: "",
+      seoDescription: product.seoDescription,
+      publicationStatus: "draft",
+    });
+    setImages(
+      product.images.map((image) => ({ ...image, id: createId() })),
+    );
+    setOptions(duplicatedOptions);
+    setVariants(
+      product.variants.map((variant, index) => ({
+        ...variant,
+        id: createId(),
+        sku: `${variant.sku}-COPY-${index + 1}`,
+        optionValueIds: variant.optionValueIds
+          .map((id) => valueIdMap.get(id))
+          .filter((id): id is string => Boolean(id)),
+      })),
+    );
+    setAttributes(
+      attributesToDraft(product.attributes).map((attribute) => ({
+        ...attribute,
+        id: createId(),
+      })),
+    );
+    setNoticeTone("success");
+    setNotice("Создана копия. Измените slug и артикул при необходимости.");
+    setShowPreview(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -177,6 +277,7 @@ export function ProductManager() {
         (product) => product.slug === parsed.slug && product.id !== editingId,
       )
     ) {
+      setNoticeTone("error");
       setNotice("Такой slug уже используется.");
       return;
     }
@@ -185,6 +286,7 @@ export function ProductManager() {
         (product) => product.sku === parsed.sku && product.id !== editingId,
       )
     ) {
+      setNoticeTone("error");
       setNotice("Такой артикул уже используется.");
       return;
     }
@@ -236,19 +338,22 @@ export function ProductManager() {
       isRecommended: parsed.isRecommended,
       sortOrder: parsed.sortOrder,
       options,
-      variants: [
-        {
-          id: current?.variants[0]?.id ?? createId(),
-          sku: parsed.sku,
-          optionValueIds: options.flatMap((option) =>
-            option.values[0] ? [option.values[0].id] : [],
-          ),
-          priceModifierKopecks: 0,
-          stockQuantity,
-          availabilityStatus: parsed.availabilityStatus,
-          active: true,
-        },
-      ],
+      variants:
+        variants.length > 0
+          ? variants
+          : [
+              {
+                id: current?.variants[0]?.id ?? createId(),
+                sku: parsed.sku,
+                optionValueIds: options.flatMap((option) =>
+                  option.values[0] ? [option.values[0].id] : [],
+                ),
+                priceModifierKopecks: 0,
+                stockQuantity,
+                availabilityStatus: parsed.availabilityStatus,
+                active: true,
+              },
+            ],
       attributes: draftToAttributes(attributes),
       seoTitle: parsed.seoTitle,
       seoDescription: parsed.seoDescription,
@@ -259,13 +364,16 @@ export function ProductManager() {
 
     try {
       await saveProduct(productToSave);
+      setNoticeTone("success");
       setNotice(current ? "Товар обновлён." : "Товар добавлен.");
       setEditingId(null);
       reset(emptyForm);
       setImages(defaultImages());
       setOptions([]);
+      setVariants([]);
       setAttributes([]);
     } catch {
+      setNoticeTone("error");
       setNotice(
         "Не удалось сохранить товар. Проверьте вход администратора и соединение.",
       );
@@ -280,7 +388,14 @@ export function ProductManager() {
           product.publicationStatus === "published" ? "hidden" : "published",
         updatedAt: new Date().toISOString(),
       });
+      setNoticeTone("success");
+      setNotice(
+        product.publicationStatus === "published"
+          ? "Товар скрыт."
+          : "Товар опубликован.",
+      );
     } catch {
+      setNoticeTone("error");
       setNotice(
         "Не удалось изменить публикацию. Проверьте вход администратора и соединение.",
       );
@@ -295,7 +410,10 @@ export function ProductManager() {
     ) {
       try {
         await deleteProduct(product.id);
+        setNoticeTone("success");
+        setNotice("Товар удалён.");
       } catch {
+        setNoticeTone("error");
         setNotice(
           "Не удалось удалить товар. Проверьте вход администратора и связанные заказы.",
         );
@@ -423,6 +541,12 @@ export function ProductManager() {
 
           <ImageEditor images={images} onChange={setImages} />
           <OptionEditor options={options} onChange={setOptions} />
+          <VariantEditor
+            variants={variants}
+            options={options}
+            productSku={previewValues.sku ?? ""}
+            onChange={setVariants}
+          />
           <AttributeEditor attributes={attributes} onChange={setAttributes} />
 
           <AdminSection title="Отметки и публикация">
@@ -455,14 +579,64 @@ export function ProductManager() {
             </AdminField>
           </AdminSection>
 
+          <button
+            type="button"
+            onClick={() => setShowPreview((current) => !current)}
+            className="admin-secondary w-full"
+          >
+            {showPreview ? "Скрыть предпросмотр" : "Предварительный просмотр"}
+          </button>
+          {showPreview ? (
+            <ProductPreview
+              name={previewValues.name ?? ""}
+              description={previewValues.shortDescription ?? ""}
+              regularPriceRub={Number(previewValues.regularPriceRub ?? 0)}
+              salePriceRub={
+                previewValues.salePriceRub === ""
+                  ? null
+                  : Number(previewValues.salePriceRub ?? 0)
+              }
+              image={images.find((image) => image.isPrimary) ?? images[0]}
+              optionCount={options.length}
+            />
+          ) : null}
+
           {notice ? (
-            <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-800">
+            <p
+              role={noticeTone === "error" ? "alert" : "status"}
+              className={`rounded-xl p-3 text-sm font-semibold ${
+                noticeTone === "error"
+                  ? "bg-red-50 text-red-700"
+                  : "bg-emerald-50 text-emerald-800"
+              }`}
+            >
               {notice}
             </p>
           ) : null}
-          <button type="submit" className="admin-primary w-full">
-            {editingId ? "Сохранить товар" : "Добавить товар"}
-          </button>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              className="admin-secondary w-full"
+              onClick={() =>
+                void handleSubmit((values) =>
+                  onSubmit({ ...values, publicationStatus: "draft" }),
+                )()
+              }
+            >
+              Сохранить черновик
+            </button>
+            <button
+              type="button"
+              className="admin-primary w-full"
+              onClick={() =>
+                void handleSubmit((values) =>
+                  onSubmit({ ...values, publicationStatus: "published" }),
+                )()
+              }
+            >
+              Опубликовать товар
+            </button>
+          </div>
         </form>
       </section>
 
@@ -480,13 +654,51 @@ export function ProductManager() {
             + Добавить
           </button>
         </div>
-        <input
-          type="search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          className="admin-input mt-5"
-          placeholder="Поиск по названию, slug или артикулу"
-        />
+        <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            className="admin-input sm:col-span-2 xl:col-span-1"
+            placeholder="Название, slug или артикул"
+          />
+          <select
+            value={categoryFilter}
+            onChange={(event) => setCategoryFilter(event.target.value)}
+            className="admin-input"
+            aria-label="Фильтр по категории"
+          >
+            <option value="all">Все категории</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            className="admin-input"
+            aria-label="Фильтр по публикации"
+          >
+            <option value="all">Все публикации</option>
+            <option value="published">Опубликованные</option>
+            <option value="draft">Черновики</option>
+            <option value="hidden">Скрытые</option>
+          </select>
+          <select
+            value={availabilityFilter}
+            onChange={(event) => setAvailabilityFilter(event.target.value)}
+            className="admin-input"
+            aria-label="Фильтр по наличию"
+          >
+            <option value="all">Любое наличие</option>
+            <option value="in_stock">В наличии</option>
+            <option value="limited">Мало</option>
+            <option value="out_of_stock">Нет в наличии</option>
+            <option value="preorder">Предзаказ</option>
+          </select>
+        </div>
         <div className="mt-4 grid gap-3">
           {filteredProducts.map((product) => (
             <article
@@ -542,6 +754,18 @@ export function ProductManager() {
                   <button type="button" onClick={() => startEdit(product)} className="admin-secondary">
                     Изменить
                   </button>
+                  <button type="button" onClick={() => startDuplicate(product)} className="admin-secondary">
+                    Дублировать
+                  </button>
+                  {product.publicationStatus === "published" ? (
+                    <Link
+                      href={`/product/${product.slug}`}
+                      target="_blank"
+                      className="admin-secondary"
+                    >
+                      Посмотреть
+                    </Link>
+                  ) : null}
                   <button type="button" onClick={() => toggleVisibility(product)} className="admin-secondary">
                     {product.publicationStatus === "published" ? "Скрыть" : "Опубликовать"}
                   </button>
@@ -552,9 +776,84 @@ export function ProductManager() {
               </div>
             </article>
           ))}
+          {filteredProducts.length === 0 ? (
+            <p className="rounded-2xl bg-white p-6 text-center text-sm text-slate-500">
+              Товары по выбранным фильтрам не найдены.
+            </p>
+          ) : null}
         </div>
       </section>
     </div>
+  );
+}
+
+function ProductPreview({
+  name,
+  description,
+  regularPriceRub,
+  salePriceRub,
+  image,
+  optionCount,
+}: {
+  name: string;
+  description: string;
+  regularPriceRub: number;
+  salePriceRub: number | null;
+  image?: ProductImage;
+  optionCount: number;
+}) {
+  return (
+    <section
+      aria-label="Предварительный просмотр товара"
+      className="overflow-hidden rounded-3xl border border-rose-200 bg-rose-50"
+    >
+      <div
+        className="aspect-[16/10] bg-cover bg-center"
+        style={
+          image
+            ? {
+                backgroundImage: `linear-gradient(rgb(15 23 42 / 0.08), rgb(15 23 42 / 0.08)), url("${image.src}")`,
+              }
+            : undefined
+        }
+      />
+      <div className="p-5">
+        <p className="text-xs font-bold uppercase tracking-[0.15em] text-rose-600">
+          Предпросмотр карточки
+        </p>
+        <h3 className="mt-2 text-xl font-black">
+          {name || "Название товара"}
+        </h3>
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
+          {description || "Краткое описание появится здесь."}
+        </p>
+        <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xl font-black text-rose-700">
+              {formatMoney({
+                amountKopecks: Math.round(
+                  (salePriceRub ?? regularPriceRub) * 100,
+                ),
+                currency: "RUB",
+              })}
+            </p>
+            {salePriceRub !== null ? (
+              <p className="text-xs text-slate-500 line-through">
+                {formatMoney({
+                  amountKopecks: Math.round(regularPriceRub * 100),
+                  currency: "RUB",
+                })}
+              </p>
+            ) : null}
+          </div>
+          <span className="text-xs font-semibold text-slate-500">
+            {optionCount
+              ? `${optionCount} настраиваемых опций`
+              : "Без дополнительных опций"}
+          </span>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -887,6 +1186,173 @@ function OptionEditor({
         }
       >
         + Добавить универсальную опцию
+      </button>
+    </AdminSection>
+  );
+}
+
+function VariantEditor({
+  variants,
+  options,
+  productSku,
+  onChange,
+}: {
+  variants: ProductVariant[];
+  options: ProductOption[];
+  productSku: string;
+  onChange: (variants: ProductVariant[]) => void;
+}) {
+  const optionValues = options.flatMap((option) =>
+    option.values.map((value) => ({
+      ...value,
+      optionName: option.name,
+    })),
+  );
+
+  function update(id: string, patch: Partial<ProductVariant>) {
+    onChange(
+      variants.map((variant) =>
+        variant.id === id ? { ...variant, ...patch } : variant,
+      ),
+    );
+  }
+
+  function toggleValue(variant: ProductVariant, valueId: string) {
+    update(variant.id, {
+      optionValueIds: variant.optionValueIds.includes(valueId)
+        ? variant.optionValueIds.filter((id) => id !== valueId)
+        : [...variant.optionValueIds, valueId],
+    });
+  }
+
+  return (
+    <AdminSection title="Продаваемые варианты">
+      <p className="text-sm leading-6 text-slate-500">
+        Вариант может иметь собственный артикул, доплату, остаток и набор
+        значений опций.
+      </p>
+      {variants.map((variant, index) => (
+        <div
+          key={variant.id}
+          className="grid gap-3 rounded-xl bg-slate-50 p-3"
+        >
+          <div className="grid gap-2 sm:grid-cols-3">
+            <input
+              value={variant.sku}
+              onChange={(event) =>
+                update(variant.id, { sku: event.target.value })
+              }
+              className="admin-input"
+              aria-label={`Артикул варианта ${index + 1}`}
+              placeholder="Артикул варианта"
+            />
+            <input
+              type="number"
+              value={variant.priceModifierKopecks / 100}
+              onChange={(event) =>
+                update(variant.id, {
+                  priceModifierKopecks:
+                    Math.round(Number(event.target.value) * 100) || 0,
+                })
+              }
+              className="admin-input"
+              aria-label={`Доплата варианта ${index + 1} в рублях`}
+              placeholder="Доплата, ₽"
+            />
+            <input
+              type="number"
+              min="0"
+              value={variant.stockQuantity ?? ""}
+              onChange={(event) =>
+                update(variant.id, {
+                  stockQuantity:
+                    event.target.value === ""
+                      ? null
+                      : Math.max(0, Number(event.target.value)),
+                })
+              }
+              className="admin-input"
+              aria-label={`Остаток варианта ${index + 1}`}
+              placeholder="Остаток"
+            />
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <select
+              value={variant.availabilityStatus}
+              onChange={(event) =>
+                update(variant.id, {
+                  availabilityStatus: event.target
+                    .value as ProductVariant["availabilityStatus"],
+                })
+              }
+              className="admin-input"
+              aria-label={`Наличие варианта ${index + 1}`}
+            >
+              <option value="in_stock">В наличии</option>
+              <option value="limited">Мало</option>
+              <option value="out_of_stock">Нет в наличии</option>
+              <option value="preorder">Предзаказ</option>
+            </select>
+            <label className="admin-check">
+              <input
+                type="checkbox"
+                checked={variant.active}
+                onChange={(event) =>
+                  update(variant.id, { active: event.target.checked })
+                }
+              />
+              Вариант активен
+            </label>
+          </div>
+          {optionValues.length ? (
+            <fieldset>
+              <legend className="text-xs font-bold text-slate-600">
+                Значения опций
+              </legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {optionValues.map((value) => (
+                  <label key={value.id} className="admin-check">
+                    <input
+                      type="checkbox"
+                      checked={variant.optionValueIds.includes(value.id)}
+                      onChange={() => toggleValue(variant, value.id)}
+                    />
+                    {value.optionName}: {value.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+          <button
+            type="button"
+            className="admin-danger w-fit"
+            onClick={() =>
+              onChange(variants.filter((item) => item.id !== variant.id))
+            }
+          >
+            Удалить вариант
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        className="admin-secondary"
+        onClick={() =>
+          onChange([
+            ...variants,
+            {
+              id: createId(),
+              sku: `${productSku || "VARIANT"}-${variants.length + 1}`,
+              optionValueIds: [],
+              priceModifierKopecks: 0,
+              stockQuantity: 0,
+              availabilityStatus: "in_stock",
+              active: true,
+            },
+          ])
+        }
+      >
+        + Добавить продаваемый вариант
       </button>
     </AdminSection>
   );

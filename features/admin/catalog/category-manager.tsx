@@ -37,6 +37,7 @@ export function CategoryManager() {
   const deleteCategory = useCatalogStore((state) => state.deleteCategory);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const [noticeTone, setNoticeTone] = useState<"success" | "error">("success");
   const {
     register,
     handleSubmit,
@@ -83,10 +84,12 @@ export function CategoryManager() {
         category.slug === parsed.slug && category.id !== editingId,
     );
     if (duplicateSlug) {
+      setNoticeTone("error");
       setNotice("Такой slug уже используется другой категорией.");
       return;
     }
     if (parsed.parentId === editingId) {
+      setNoticeTone("error");
       setNotice("Категория не может быть родителем самой себе.");
       return;
     }
@@ -101,10 +104,12 @@ export function CategoryManager() {
         createdAt: current?.createdAt ?? now,
         updatedAt: now,
       });
+      setNoticeTone("success");
       setNotice(current ? "Категория обновлена." : "Категория добавлена.");
       setEditingId(null);
       reset(emptyForm);
     } catch {
+      setNoticeTone("error");
       setNotice(
         "Не удалось сохранить категорию. Проверьте вход администратора и соединение.",
       );
@@ -127,7 +132,10 @@ export function CategoryManager() {
     if (window.confirm(`Удалить категорию «${category.name}»?`)) {
       try {
         await deleteCategory(category.id);
+        setNoticeTone("success");
+        setNotice("Категория удалена.");
       } catch {
+        setNoticeTone("error");
         setNotice(
           "Не удалось удалить категорию. Возможно, она используется или нет прав администратора.",
         );
@@ -143,10 +151,43 @@ export function CategoryManager() {
           category.publicationStatus === "published" ? "hidden" : "published",
         updatedAt: new Date().toISOString(),
       });
+      setNoticeTone("success");
+      setNotice(
+        category.publicationStatus === "published"
+          ? "Категория скрыта."
+          : "Категория опубликована.",
+      );
     } catch {
+      setNoticeTone("error");
       setNotice(
         "Не удалось изменить публикацию. Проверьте вход администратора и соединение.",
       );
+    }
+  }
+
+  async function moveCategory(category: Category, direction: -1 | 1) {
+    const index = sorted.findIndex((item) => item.id === category.id);
+    const target = sorted[index + direction];
+    if (!target) return;
+    const now = new Date().toISOString();
+    try {
+      await Promise.all([
+        saveCategory({
+          ...category,
+          sortOrder: target.sortOrder,
+          updatedAt: now,
+        }),
+        saveCategory({
+          ...target,
+          sortOrder: category.sortOrder,
+          updatedAt: now,
+        }),
+      ]);
+      setNoticeTone("success");
+      setNotice("Порядок категорий изменён.");
+    } catch {
+      setNoticeTone("error");
+      setNotice("Не удалось изменить порядок категорий.");
     }
   }
 
@@ -232,7 +273,14 @@ export function CategoryManager() {
             <textarea {...register("seoDescription")} className="admin-input min-h-20" />
           </AdminField>
           {notice ? (
-            <p className="rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-800">
+            <p
+              role={noticeTone === "error" ? "alert" : "status"}
+              className={`rounded-xl p-3 text-sm font-semibold ${
+                noticeTone === "error"
+                  ? "bg-red-50 text-red-700"
+                  : "bg-emerald-50 text-emerald-800"
+              }`}
+            >
               {notice}
             </p>
           ) : null}
@@ -288,6 +336,24 @@ export function CategoryManager() {
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void moveCategory(category, -1)}
+                      disabled={sorted[0]?.id === category.id}
+                      className="admin-secondary"
+                      aria-label={`Переместить «${category.name}» выше`}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void moveCategory(category, 1)}
+                      disabled={sorted.at(-1)?.id === category.id}
+                      className="admin-secondary"
+                      aria-label={`Переместить «${category.name}» ниже`}
+                    >
+                      ↓
+                    </button>
                     <button
                       type="button"
                       onClick={() => startEdit(category)}

@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import { createStore, type StoreApi } from "zustand/vanilla";
 import { useStore } from "zustand";
 import { mockCatalogSeed } from "@/data/catalog-seed";
@@ -172,8 +173,10 @@ export function CatalogProvider({
 }
 
 function CatalogStatus() {
+  const pathname = usePathname();
   const error = useCatalogStore((state) => state.loadError);
   const isRefreshing = useCatalogStore((state) => state.isRefreshing);
+  if (pathname.startsWith("/admin")) return null;
   if (!error && !isRefreshing) return null;
 
   return (

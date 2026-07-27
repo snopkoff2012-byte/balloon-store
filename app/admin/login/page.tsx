@@ -47,12 +47,23 @@ export default async function AdminLoginPage({
         в таблице admin_profiles.
       </p>
       {!environment ? (
-        <p className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900">
-          Supabase ещё не настроен в локальном окружении. Демонстрационная
-          административная панель доступна без входа.
+        <p
+          role="alert"
+          className="mt-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-900"
+        >
+          Вход временно недоступен: подключение Supabase не настроено. Панель
+          остаётся закрытой.
         </p>
       ) : (
         <>
+          {error === "configuration" ? (
+            <p
+              role="alert"
+              className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700"
+            >
+              Панель закрыта до настройки подключения Supabase.
+            </p>
+          ) : null}
           {error === "access" ? (
             <p role="alert" className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">
               Аккаунт найден, но права администратора не назначены.
