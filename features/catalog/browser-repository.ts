@@ -3,6 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { getPublicEnvironment } from "@/lib/environment";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { withSupabaseRequestTimeout } from "@/lib/supabase/request-timeout";
 import type {
   CatalogSnapshot,
   Category,
@@ -187,36 +188,48 @@ export async function loadCatalogFromSupabaseBrowser({
   const productColumns: string = admin
     ? "id,name,slug,sku,short_description,full_description,regular_price_kopecks,sale_price_kopecks,cost_price_kopecks,primary_category_id,stock_quantity,availability_status,is_made_to_order,is_bestseller,is_new,is_recommended,sort_order,attributes,seo_title,seo_description,publication_status,created_at,updated_at"
     : "id,name,slug,sku,short_description,full_description,regular_price_kopecks,sale_price_kopecks,primary_category_id,stock_quantity,availability_status,is_made_to_order,is_bestseller,is_new,is_recommended,sort_order,attributes,seo_title,seo_description,publication_status,created_at,updated_at";
-  const results = await Promise.all([
-    supabase
-      .from("categories")
-      .select(
-        "id,name,slug,short_description,full_description,image_path,parent_id,sort_order,publication_status,seo_title,seo_description,created_at,updated_at",
-      )
-      .order("sort_order"),
-    supabase.from("products").select(productColumns).order("sort_order"),
-    supabase
-      .from("product_images")
-      .select("id,product_id,storage_path,alt_text,sort_order,is_primary")
-      .order("sort_order"),
-    supabase
-      .from("product_categories")
-      .select("product_id,category_id,is_primary,sort_order")
-      .order("sort_order"),
-    supabase
-      .from("product_options")
-      .select("id,product_id,code,name,option_type,is_required,sort_order")
-      .order("sort_order"),
-    supabase
-      .from("product_option_values")
-      .select("id,option_id,label,value,price_modifier_kopecks,sort_order")
-      .order("sort_order"),
-    supabase
-      .from("product_variants")
-      .select(
-        "id,product_id,sku,option_value_ids,price_modifier_kopecks,stock_quantity,availability_status,is_active",
-      ),
-  ]);
+  const results = await withSupabaseRequestTimeout((signal) =>
+    Promise.all([
+      supabase
+        .from("categories")
+        .select(
+          "id,name,slug,short_description,full_description,image_path,parent_id,sort_order,publication_status,seo_title,seo_description,created_at,updated_at",
+        )
+        .order("sort_order")
+        .abortSignal(signal),
+      supabase
+        .from("products")
+        .select(productColumns)
+        .order("sort_order")
+        .abortSignal(signal),
+      supabase
+        .from("product_images")
+        .select("id,product_id,storage_path,alt_text,sort_order,is_primary")
+        .order("sort_order")
+        .abortSignal(signal),
+      supabase
+        .from("product_categories")
+        .select("product_id,category_id,is_primary,sort_order")
+        .order("sort_order")
+        .abortSignal(signal),
+      supabase
+        .from("product_options")
+        .select("id,product_id,code,name,option_type,is_required,sort_order")
+        .order("sort_order")
+        .abortSignal(signal),
+      supabase
+        .from("product_option_values")
+        .select("id,option_id,label,value,price_modifier_kopecks,sort_order")
+        .order("sort_order")
+        .abortSignal(signal),
+      supabase
+        .from("product_variants")
+        .select(
+          "id,product_id,sku,option_value_ids,price_modifier_kopecks,stock_quantity,availability_status,is_active",
+        )
+        .abortSignal(signal),
+    ] as const),
+  );
   const databaseError = results.map((result) => result.error).find(Boolean);
   if (databaseError) throw new Error(databaseError.message);
 

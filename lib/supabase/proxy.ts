@@ -3,8 +3,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getOptionalPublicEnvironment } from "@/lib/environment";
 
 export async function updateSupabaseSession(request: NextRequest) {
+  const isAdminLogin = request.nextUrl.pathname === "/admin/login";
   const environment = getOptionalPublicEnvironment();
   if (!environment) {
+    if (!isAdminLogin) {
+      return NextResponse.redirect(
+        new URL("/admin/login?error=configuration", request.url),
+      );
+    }
     return NextResponse.next({ request });
   }
 
@@ -13,6 +19,9 @@ export async function updateSupabaseSession(request: NextRequest) {
     .getAll()
     .some(({ name }) => name.startsWith("sb-") && name.includes("-auth-token"));
   if (!hasSupabaseSession) {
+    if (!isAdminLogin) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
     return response;
   }
 
@@ -40,6 +49,9 @@ export async function updateSupabaseSession(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getClaims();
+  const { data, error } = await supabase.auth.getClaims();
+  if ((error || !data?.claims?.sub) && !isAdminLogin) {
+    return NextResponse.redirect(new URL("/admin/login", request.url));
+  }
   return response;
 }

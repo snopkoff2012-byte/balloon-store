@@ -1,6 +1,7 @@
 "use client";
 
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { withSupabaseRequestTimeout } from "@/lib/supabase/request-timeout";
 import {
   defaultStoreSettings,
   type AdminOperationsSnapshot,
@@ -35,13 +36,34 @@ function stringArray(value: unknown) {
 export async function loadAdminOperations(): Promise<AdminOperationsSnapshot> {
   const supabase = createBrowserSupabaseClient();
   const [ordersResult, itemsResult, zonesResult, promosResult, settingsResult] =
-    await Promise.all([
-      supabase.from("orders").select("*").order("created_at", { ascending: false }),
-      supabase.from("order_items").select("*").order("created_at"),
-      supabase.from("delivery_zones").select("*").order("sort_order"),
-      supabase.from("promo_codes").select("*").order("created_at", { ascending: false }),
-      supabase.from("site_settings").select("key,value"),
-    ]);
+    await withSupabaseRequestTimeout((signal) =>
+      Promise.all([
+        supabase
+          .from("orders")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .abortSignal(signal),
+        supabase
+          .from("order_items")
+          .select("*")
+          .order("created_at")
+          .abortSignal(signal),
+        supabase
+          .from("delivery_zones")
+          .select("*")
+          .order("sort_order")
+          .abortSignal(signal),
+        supabase
+          .from("promo_codes")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .abortSignal(signal),
+        supabase
+          .from("site_settings")
+          .select("key,value")
+          .abortSignal(signal),
+      ] as const),
+    );
 
   [
     ordersResult,
@@ -51,7 +73,9 @@ export async function loadAdminOperations(): Promise<AdminOperationsSnapshot> {
     settingsResult,
   ].forEach((result) => assertNoError(result.error));
 
-  const items = (itemsResult.data ?? []).map((row) => {
+  const items = (
+    (itemsResult.data ?? []) as Array<Record<string, unknown>>
+  ).map((row) => {
     const snapshot = objectValue(row.product_snapshot);
     return {
       id: String(row.id),
@@ -68,7 +92,9 @@ export async function loadAdminOperations(): Promise<AdminOperationsSnapshot> {
     };
   });
 
-  const orders: AdminOrder[] = (ordersResult.data ?? []).map((row) => ({
+  const orders: AdminOrder[] = (
+    (ordersResult.data ?? []) as Array<Record<string, unknown>>
+  ).map((row) => ({
     id: String(row.id),
     orderNumber: numberValue(row.order_number),
     status: row.status as AdminOrder["status"],
@@ -110,46 +136,49 @@ export async function loadAdminOperations(): Promise<AdminOperationsSnapshot> {
       })),
   }));
 
-  const deliveryZones: DeliveryZone[] = (zonesResult.data ?? []).map((row) => ({
-    id: String(row.id),
-    name: String(row.name),
-    slug: String(row.slug),
-    description: String(row.description ?? ""),
-    basePriceKopecks: numberValue(row.base_price_kopecks),
-    pricePerKmKopecks: numberValue(row.price_per_km_kopecks),
-    freeFromKopecks: nullableNumber(row.free_from_kopecks),
-    minimumOrderKopecks: numberValue(row.minimum_order_kopecks),
-    urgentSurchargeKopecks: numberValue(row.urgent_surcharge_kopecks),
-    deliveryIntervals: stringArray(row.delivery_intervals),
-    isActive: Boolean(row.is_active),
-    sortOrder: numberValue(row.sort_order),
-    createdAt: String(row.created_at),
-    updatedAt: String(row.updated_at),
+  const deliveryZones: DeliveryZone[] = (
+    (zonesResult.data ?? []) as Array<Record<string, unknown>>
+  ).map((row) => ({
+      id: String(row.id),
+      name: String(row.name),
+      slug: String(row.slug),
+      description: String(row.description ?? ""),
+      basePriceKopecks: numberValue(row.base_price_kopecks),
+      pricePerKmKopecks: numberValue(row.price_per_km_kopecks),
+      freeFromKopecks: nullableNumber(row.free_from_kopecks),
+      minimumOrderKopecks: numberValue(row.minimum_order_kopecks),
+      urgentSurchargeKopecks: numberValue(row.urgent_surcharge_kopecks),
+      deliveryIntervals: stringArray(row.delivery_intervals),
+      isActive: Boolean(row.is_active),
+      sortOrder: numberValue(row.sort_order),
+      createdAt: String(row.created_at),
+      updatedAt: String(row.updated_at),
   }));
 
-  const promoCodes: PromoCode[] = (promosResult.data ?? []).map((row) => ({
-    id: String(row.id),
-    code: String(row.code),
-    description: String(row.description ?? ""),
-    discountType: row.discount_type as PromoCode["discountType"],
-    discountValue: numberValue(row.discount_value),
-    minimumOrderKopecks: numberValue(row.minimum_order_kopecks),
-    maximumDiscountKopecks: nullableNumber(row.maximum_discount_kopecks),
-    startsAt: row.starts_at ? String(row.starts_at) : null,
-    endsAt: row.ends_at ? String(row.ends_at) : null,
-    usageLimit: nullableNumber(row.usage_limit),
-    perCustomerLimit: nullableNumber(row.per_customer_limit),
-    usageCount: numberValue(row.usage_count),
-    isActive: Boolean(row.is_active),
-    createdAt: String(row.created_at),
-    updatedAt: String(row.updated_at),
+  const promoCodes: PromoCode[] = (
+    (promosResult.data ?? []) as Array<Record<string, unknown>>
+  ).map((row) => ({
+      id: String(row.id),
+      code: String(row.code),
+      description: String(row.description ?? ""),
+      discountType: row.discount_type as PromoCode["discountType"],
+      discountValue: numberValue(row.discount_value),
+      minimumOrderKopecks: numberValue(row.minimum_order_kopecks),
+      maximumDiscountKopecks: nullableNumber(row.maximum_discount_kopecks),
+      startsAt: row.starts_at ? String(row.starts_at) : null,
+      endsAt: row.ends_at ? String(row.ends_at) : null,
+      usageLimit: nullableNumber(row.usage_limit),
+      perCustomerLimit: nullableNumber(row.per_customer_limit),
+      usageCount: numberValue(row.usage_count),
+      isActive: Boolean(row.is_active),
+      createdAt: String(row.created_at),
+      updatedAt: String(row.updated_at),
   }));
 
   const rows = new Map(
-    (settingsResult.data ?? []).map((row) => [
-      String(row.key),
-      objectValue(row.value),
-    ]),
+    ((settingsResult.data ?? []) as Array<Record<string, unknown>>).map(
+      (row) => [String(row.key), objectValue(row.value)] as const,
+    ),
   );
   const contacts = rows.get("store.contacts") ?? {};
   const hours = rows.get("store.working_hours") ?? {};

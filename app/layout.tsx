@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Manrope, Prata } from "next/font/google";
-import { CatalogProvider } from "@/features/catalog/store";
-import { loadPublicCatalog } from "@/features/catalog/server-repository";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -49,17 +47,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const catalog = await loadPublicCatalog();
-
   return (
     <html lang="ru">
       <body className={`${manrope.variable} ${prata.variable} antialiased`}>
-        <CatalogProvider initial={catalog}>{children}</CatalogProvider>
+        {children}
       </body>
     </html>
   );

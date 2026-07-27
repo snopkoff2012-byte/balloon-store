@@ -5,6 +5,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { mockCatalogSeed } from "@/data/catalog-seed";
 import { getOptionalPublicEnvironment } from "@/lib/environment";
+import { withSupabaseRequestTimeout } from "@/lib/supabase/request-timeout";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type {
   CatalogSnapshot,
@@ -155,6 +156,17 @@ async function loadCatalog(
     };
   }
 
+  // Vinext probes layouts outside an actual request in development. External
+  // fetches started during that probe never settle, so hydrate from the local
+  // snapshot immediately and let the browser refresh it from Supabase.
+  if (process.env.NODE_ENV === "development") {
+    return {
+      snapshot: mockCatalogSeed,
+      source: "fallback",
+      error: null,
+    };
+  }
+
   try {
     const supabase = loadOptions.includeUnpublished
       ? await createServerSupabaseClient()
@@ -172,52 +184,60 @@ async function loadCatalog(
     let catalogRows: z.infer<typeof publicCatalogRpcSchema>;
 
     if (!loadOptions.includeUnpublished) {
-      catalogRows = await withTimeout(
-        loadPublicCatalogRows(supabase),
-        800,
+      catalogRows = await withSupabaseRequestTimeout((signal) =>
+        loadPublicCatalogRows(supabase, signal),
       );
     } else {
-      const results = await Promise.all([
-        supabase
-          .from("categories")
-          .select(
-            "id,name,slug,short_description,full_description,image_path,parent_id,sort_order,publication_status,seo_title,seo_description,created_at,updated_at",
-          )
-          .order("sort_order"),
-        supabase
-          .from("products")
-          .select(
-            "id,name,slug,sku,short_description,full_description,regular_price_kopecks,sale_price_kopecks,cost_price_kopecks,primary_category_id,stock_quantity,availability_status,is_made_to_order,is_bestseller,is_new,is_recommended,sort_order,attributes,seo_title,seo_description,publication_status,created_at,updated_at",
-          )
-          .order("sort_order"),
-        supabase
-          .from("product_images")
-          .select(
-            "id,product_id,storage_path,alt_text,sort_order,is_primary",
-          )
-          .order("sort_order"),
-        supabase
-          .from("product_categories")
-          .select("product_id,category_id,is_primary,sort_order")
-          .order("sort_order"),
-        supabase
-          .from("product_options")
-          .select(
-            "id,product_id,code,name,option_type,is_required,sort_order",
-          )
-          .order("sort_order"),
-        supabase
-          .from("product_option_values")
-          .select(
-            "id,option_id,label,value,price_modifier_kopecks,sort_order",
-          )
-          .order("sort_order"),
-        supabase
-          .from("product_variants")
-          .select(
-            "id,product_id,sku,option_value_ids,price_modifier_kopecks,stock_quantity,availability_status,is_active",
-          ),
-      ]);
+      const results = await withSupabaseRequestTimeout((signal) =>
+        Promise.all([
+          supabase
+            .from("categories")
+            .select(
+              "id,name,slug,short_description,full_description,image_path,parent_id,sort_order,publication_status,seo_title,seo_description,created_at,updated_at",
+            )
+            .order("sort_order")
+            .abortSignal(signal),
+          supabase
+            .from("products")
+            .select(
+              "id,name,slug,sku,short_description,full_description,regular_price_kopecks,sale_price_kopecks,cost_price_kopecks,primary_category_id,stock_quantity,availability_status,is_made_to_order,is_bestseller,is_new,is_recommended,sort_order,attributes,seo_title,seo_description,publication_status,created_at,updated_at",
+            )
+            .order("sort_order")
+            .abortSignal(signal),
+          supabase
+            .from("product_images")
+            .select(
+              "id,product_id,storage_path,alt_text,sort_order,is_primary",
+            )
+            .order("sort_order")
+            .abortSignal(signal),
+          supabase
+            .from("product_categories")
+            .select("product_id,category_id,is_primary,sort_order")
+            .order("sort_order")
+            .abortSignal(signal),
+          supabase
+            .from("product_options")
+            .select(
+              "id,product_id,code,name,option_type,is_required,sort_order",
+            )
+            .order("sort_order")
+            .abortSignal(signal),
+          supabase
+            .from("product_option_values")
+            .select(
+              "id,option_id,label,value,price_modifier_kopecks,sort_order",
+            )
+            .order("sort_order")
+            .abortSignal(signal),
+          supabase
+            .from("product_variants")
+            .select(
+              "id,product_id,sku,option_value_ids,price_modifier_kopecks,stock_quantity,availability_status,is_active",
+            )
+            .abortSignal(signal),
+        ] as const),
+      );
       const databaseError = results.map((result) => result.error).find(Boolean);
       if (databaseError) throw new Error(databaseError.message);
       catalogRows = publicCatalogRpcSchema.parse({
@@ -349,58 +369,75 @@ async function loadCatalog(
   }
 }
 
-async function loadPublicCatalogRows(supabase: SupabaseClient) {
-  const categoryResult = await supabase
-    .from("categories")
-    .select(
-      "id,name,slug,short_description,full_description,image_path,parent_id,sort_order,publication_status,seo_title,seo_description,created_at,updated_at",
-    )
-    .eq("publication_status", "published")
-    .order("sort_order");
-  if (categoryResult.error) throw new Error(categoryResult.error.message);
-
-  const productResult = await supabase
-    .from("products")
-    .select(
-      "id,name,slug,sku,short_description,full_description,regular_price_kopecks,sale_price_kopecks,primary_category_id,stock_quantity,availability_status,is_made_to_order,is_bestseller,is_new,is_recommended,sort_order,attributes,seo_title,seo_description,publication_status,created_at,updated_at",
-    )
-    .eq("publication_status", "published")
-    .order("sort_order");
-  if (productResult.error) throw new Error(productResult.error.message);
-
-  const imageResult = await supabase
-    .from("product_images")
-    .select("id,product_id,storage_path,alt_text,sort_order,is_primary")
-    .order("sort_order");
-  if (imageResult.error) throw new Error(imageResult.error.message);
-
-  const productCategoryResult = await supabase
-    .from("product_categories")
-    .select("product_id,category_id,is_primary,sort_order")
-    .order("sort_order");
-  if (productCategoryResult.error) {
-    throw new Error(productCategoryResult.error.message);
-  }
-
-  const optionResult = await supabase
-    .from("product_options")
-    .select("id,product_id,code,name,option_type,is_required,sort_order")
-    .order("sort_order");
-  if (optionResult.error) throw new Error(optionResult.error.message);
-
-  const optionValueResult = await supabase
-    .from("product_option_values")
-    .select("id,option_id,label,value,price_modifier_kopecks,sort_order")
-    .order("sort_order");
-  if (optionValueResult.error) throw new Error(optionValueResult.error.message);
-
-  const variantResult = await supabase
-    .from("product_variants")
-    .select(
-      "id,product_id,sku,option_value_ids,price_modifier_kopecks,stock_quantity,availability_status,is_active",
-    )
-    .eq("is_active", true);
-  if (variantResult.error) throw new Error(variantResult.error.message);
+async function loadPublicCatalogRows(
+  supabase: SupabaseClient,
+  signal: AbortSignal,
+) {
+  const [
+    categoryResult,
+    productResult,
+    imageResult,
+    productCategoryResult,
+    optionResult,
+    optionValueResult,
+    variantResult,
+  ] = await Promise.all([
+    supabase
+      .from("categories")
+      .select(
+        "id,name,slug,short_description,full_description,image_path,parent_id,sort_order,publication_status,seo_title,seo_description,created_at,updated_at",
+      )
+      .eq("publication_status", "published")
+      .order("sort_order")
+      .abortSignal(signal),
+    supabase
+      .from("products")
+      .select(
+        "id,name,slug,sku,short_description,full_description,regular_price_kopecks,sale_price_kopecks,primary_category_id,stock_quantity,availability_status,is_made_to_order,is_bestseller,is_new,is_recommended,sort_order,attributes,seo_title,seo_description,publication_status,created_at,updated_at",
+      )
+      .eq("publication_status", "published")
+      .order("sort_order")
+      .abortSignal(signal),
+    supabase
+      .from("product_images")
+      .select("id,product_id,storage_path,alt_text,sort_order,is_primary")
+      .order("sort_order")
+      .abortSignal(signal),
+    supabase
+      .from("product_categories")
+      .select("product_id,category_id,is_primary,sort_order")
+      .order("sort_order")
+      .abortSignal(signal),
+    supabase
+      .from("product_options")
+      .select("id,product_id,code,name,option_type,is_required,sort_order")
+      .order("sort_order")
+      .abortSignal(signal),
+    supabase
+      .from("product_option_values")
+      .select("id,option_id,label,value,price_modifier_kopecks,sort_order")
+      .order("sort_order")
+      .abortSignal(signal),
+    supabase
+      .from("product_variants")
+      .select(
+        "id,product_id,sku,option_value_ids,price_modifier_kopecks,stock_quantity,availability_status,is_active",
+      )
+      .eq("is_active", true)
+      .abortSignal(signal),
+  ] as const);
+  const databaseError = [
+    categoryResult,
+    productResult,
+    imageResult,
+    productCategoryResult,
+    optionResult,
+    optionValueResult,
+    variantResult,
+  ]
+    .map((result) => result.error)
+    .find(Boolean);
+  if (databaseError) throw new Error(databaseError.message);
 
   return publicCatalogRpcSchema.parse({
     categories: categoryResult.data,
@@ -411,23 +448,6 @@ async function loadPublicCatalogRows(supabase: SupabaseClient) {
     option_values: optionValueResult.data,
     variants: variantResult.data,
   });
-}
-
-async function withTimeout<T>(promise: Promise<T>, timeoutMs: number) {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<never>((_, reject) => {
-        timeout = setTimeout(
-          () => reject(new Error("Supabase request timeout")),
-          timeoutMs,
-        );
-      }),
-    ]);
-  } finally {
-    if (timeout) clearTimeout(timeout);
-  }
 }
 
 export const loadPublicCatalog = cache(() =>

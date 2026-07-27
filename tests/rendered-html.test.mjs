@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import "./loading-architecture.test.mjs";
 
 // Маршрутные тесты не зависят от внешней сети и проверяют аварийный каталог.
 // Реальный Supabase отдельно проверяется интеграционными запросами перед релизом.
@@ -18,8 +19,8 @@ async function render(pathname) {
       headers: { accept: "text/html" },
     }),
     {
-      NEXT_PUBLIC_SUPABASE_URL: "https://your-project.supabase.co",
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "your-publishable-key",
+      NEXT_PUBLIC_SUPABASE_URL: "",
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "",
       NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
       ASSETS: {
         fetch: async () => new Response("Not found", { status: 404 }),
