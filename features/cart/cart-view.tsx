@@ -133,15 +133,16 @@ export function CartView() {
         />
         <SummaryRow
           label="Доставка"
-          value={totals.deliveryIsFree ? "Бесплатно" : formatMoney({ amountKopecks: totals.deliveryKopecks, currency: "RUB" })}
+          value="Рассчитаем на оформлении"
         />
         <p className="mt-2 text-xs leading-5 text-white/50">
-          Точную стоимость и время подтвердит менеджер. От {formatMoney({ amountKopecks: 700_000, currency: "RUB" })} доставка бесплатна.
+          Выберите округ Москвы, город области или самовывоз на следующем шаге.
+          Тарифы берутся из актуальных настроек магазина.
         </p>
         <div className="mt-6 flex items-end justify-between border-t border-white/15 pt-5">
-          <span className="font-semibold">Итого</span>
+          <span className="font-semibold">Товары без доставки</span>
           <span className="text-2xl font-bold">
-            {formatMoney({ amountKopecks: totals.totalKopecks, currency: "RUB" })}
+            {formatMoney({ amountKopecks: totals.itemsTotalKopecks, currency: "RUB" })}
           </span>
         </div>
         {hasUnavailableItems ? (

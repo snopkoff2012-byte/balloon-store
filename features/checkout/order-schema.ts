@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getEarliestDeliveryDate, isAvailableDeliverySlot } from "./delivery";
+import { getEarliestDeliveryDate } from "./delivery";
 
 const cartLineSchema = z.object({
   productId: z.uuid(),
@@ -30,6 +30,7 @@ export const checkoutDetailsSchema = z
   cardEnabled: z.boolean(),
   cardText: z.string().trim().max(300),
   fulfillmentMethod: z.enum(["delivery", "pickup"]),
+  deliveryZoneId: z.uuid("Выберите зону доставки"),
   city: z.string().trim().max(120),
   address: z.string().trim().max(500),
   apartmentOffice: z.string().trim().max(80),
@@ -37,7 +38,7 @@ export const checkoutDetailsSchema = z
   floor: z.string().trim().max(30),
   intercom: z.string().trim().max(80),
   date: z.string().date(),
-  interval: z.string().trim().max(80),
+  interval: z.string().trim().min(1, "Выберите временной интервал").max(80),
   urgentDelivery: z.boolean(),
   paymentMethod: z.enum(["on_confirmation", "cash", "card_to_courier", "online"]),
   consent: z.boolean().refine((value) => value, "Необходимо согласие"),
@@ -61,9 +62,6 @@ export const checkoutDetailsSchema = z
     if (data.date < getEarliestDeliveryDate()) {
       context.addIssue({ code: "custom", path: ["date"], message: "Нельзя выбрать прошедшую дату" });
     }
-    if (!isAvailableDeliverySlot(data.date, data.interval)) {
-      context.addIssue({ code: "custom", path: ["interval"], message: "Этот интервал уже недоступен" });
-    }
     const age = Date.now() - data.submittedAt;
     if (age < 800 || age > 3_600_000) {
       context.addIssue({ code: "custom", path: ["submittedAt"], message: "Подтвердите форму ещё раз" });
@@ -86,6 +84,7 @@ export const orderResultSchema = z.object({
   discount_kopecks: z.coerce.number().int().nonnegative(),
   delivery_kopecks: z.coerce.number().int().nonnegative(),
   total_kopecks: z.coerce.number().int().nonnegative(),
+  delivery_price_pending: z.boolean(),
 });
 
 export type OrderResult = z.infer<typeof orderResultSchema>;

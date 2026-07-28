@@ -53,6 +53,7 @@ function valuesFromOrder(order: AdminOrder): OrderFormValues {
     deliveryRub:
       order.deliveryKopecks === null ? "" : order.deliveryKopecks / 100,
     urgentDelivery: order.urgentDelivery,
+    deliveryRequiresConfirmation: order.deliveryRequiresConfirmation,
   };
 }
 
@@ -112,6 +113,8 @@ export function OrderManager() {
           ? null
           : Math.round(parsed.deliveryRub * 100),
       urgentDelivery: parsed.urgentDelivery,
+      deliveryPricePending: parsed.deliveryRub === "",
+      deliveryRequiresConfirmation: parsed.deliveryRequiresConfirmation,
       updatedAt: new Date().toISOString(),
     };
     updated.totalKopecks =
@@ -256,6 +259,16 @@ export function OrderManager() {
               </OrderSection>
               <OrderSection title="Доставка">
                 <ContactLine
+                  label="Зона"
+                  value={
+                    String(selected.deliveryZoneSnapshot.name ?? "") ||
+                    deliveryZones.find(
+                      (zone) => zone.id === selected.deliveryZoneId,
+                    )?.name ||
+                    "Не выбрана"
+                  }
+                />
+                <ContactLine
                   label="Адрес"
                   value={formatAddress(selected.deliveryAddress)}
                 />
@@ -273,6 +286,11 @@ export function OrderManager() {
                   label="Интервал"
                   value={selected.requestedDeliverySlot || "Не указан"}
                 />
+                {selected.deliveryRequiresConfirmation ? (
+                  <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900">
+                    Адрес или стоимость требуют подтверждения менеджера.
+                  </p>
+                ) : null}
               </OrderSection>
             </div>
 
@@ -373,6 +391,13 @@ export function OrderManager() {
             <label className="admin-check mt-4 w-fit">
               <input type="checkbox" {...register("urgentDelivery")} />
               Срочная доставка
+            </label>
+            <label className="admin-check mt-3 w-fit">
+              <input
+                type="checkbox"
+                {...register("deliveryRequiresConfirmation")}
+              />
+              Адрес или стоимость ещё требуют подтверждения
             </label>
             <AdminField label="Комментарий менеджера" className="mt-4">
               <textarea

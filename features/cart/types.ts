@@ -13,7 +13,4 @@ export type CartItem = {
 export type CartTotals = {
   itemsTotalKopecks: number;
   discountKopecks: number;
-  deliveryKopecks: number;
-  totalKopecks: number;
-  deliveryIsFree: boolean;
 };

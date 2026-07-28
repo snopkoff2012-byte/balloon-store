@@ -1,14 +1,3 @@
-import { FREE_DELIVERY_FROM_KOPECKS, STANDARD_DELIVERY_KOPECKS } from "@/features/cart/pricing";
-
-export const URGENT_DELIVERY_SURCHARGE_KOPECKS = 50_000;
-
-export const deliverySlots = [
-  { value: "10:00–13:00", label: "10:00–13:00", startHour: 10 },
-  { value: "13:00–16:00", label: "13:00–16:00", startHour: 13 },
-  { value: "16:00–19:00", label: "16:00–19:00", startHour: 16 },
-  { value: "19:00–22:00", label: "19:00–22:00", startHour: 19 },
-] as const;
-
 export type FulfillmentMethod = "delivery" | "pickup";
 
 function moscowDateParts(now = new Date()) {
@@ -33,37 +22,38 @@ export function getEarliestDeliveryDate(now = new Date()) {
   return moscowDateParts(now).date;
 }
 
-export function getAvailableDeliverySlots(date: string, now = new Date()) {
+function intervalStartHour(interval: string) {
+  const match = interval.match(/^([01]\d|2[0-3]):[0-5]\d/);
+  return match ? Number(match[1]) : null;
+}
+
+export function getAvailableDeliverySlots(
+  date: string,
+  intervals: string[],
+  now = new Date(),
+) {
   const moscow = moscowDateParts(now);
   if (date < moscow.date) return [];
-  if (date > moscow.date) return [...deliverySlots];
+  const slots = intervals.map((interval) => ({
+    value: interval,
+    label: interval,
+    startHour: intervalStartHour(interval),
+  }));
+  if (date > moscow.date) return slots;
 
   // На доставку в тот же день нужно минимум два часа на сборку композиции.
-  return deliverySlots.filter((slot) => slot.startHour >= moscow.hour + 2);
+  return slots.filter(
+    (slot) => slot.startHour !== null && slot.startHour >= moscow.hour + 2,
+  );
 }
 
-export function isAvailableDeliverySlot(date: string, slot: string, now = new Date()) {
-  return getAvailableDeliverySlots(date, now).some((candidate) => candidate.value === slot);
-}
-
-export function calculateDeliveryEstimate({
-  itemsTotalKopecks,
-  fulfillmentMethod,
-  urgentDelivery,
-}: {
-  itemsTotalKopecks: number;
-  fulfillmentMethod: FulfillmentMethod;
-  urgentDelivery: boolean;
-}) {
-  if (fulfillmentMethod === "pickup") {
-    return { deliveryKopecks: 0, deliveryIsFree: true };
-  }
-
-  const deliveryIsFree = itemsTotalKopecks >= FREE_DELIVERY_FROM_KOPECKS;
-  return {
-    deliveryKopecks:
-      (deliveryIsFree ? 0 : STANDARD_DELIVERY_KOPECKS) +
-      (urgentDelivery ? URGENT_DELIVERY_SURCHARGE_KOPECKS : 0),
-    deliveryIsFree,
-  };
+export function isAvailableDeliverySlot(
+  date: string,
+  slot: string,
+  intervals: string[],
+  now = new Date(),
+) {
+  return getAvailableDeliverySlots(date, intervals, now).some(
+    (candidate) => candidate.value === slot,
+  );
 }

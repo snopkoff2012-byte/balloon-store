@@ -49,6 +49,7 @@ export async function POST(request: Request) {
       card_enabled: payload.data.cardEnabled,
       card_text: payload.data.cardText,
       fulfillment_method: payload.data.fulfillmentMethod,
+      delivery_zone_id: payload.data.deliveryZoneId,
       urgent_delivery: payload.data.urgentDelivery,
       payment_method: payload.data.paymentMethod,
       website: payload.data.website,
@@ -64,11 +65,14 @@ export async function POST(request: Request) {
 
   if (error) {
     const status = error.message.includes("CART_") ? 409 : 500;
+    const deliveryError = error.message.includes("CART_DELIVERY");
     return NextResponse.json(
       {
         error:
           status === 409
-            ? "Состав корзины изменился: проверьте наличие и цену товара."
+            ? deliveryError
+              ? "Тариф или зона доставки изменились. Выберите зону и временной интервал ещё раз."
+              : "Состав корзины изменился: проверьте наличие и цену товара."
             : "Не удалось создать заказ. Попробуйте ещё раз или напишите менеджеру.",
       },
       { status },

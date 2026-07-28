@@ -47,6 +47,9 @@ export type AdminOrder = {
   managerComment: string;
   deliveryAddress: Record<string, unknown>;
   deliveryZoneId: string | null;
+  deliveryZoneSnapshot: Record<string, unknown>;
+  deliveryPricePending: boolean;
+  deliveryRequiresConfirmation: boolean;
   requestedDeliveryDate: string | null;
   requestedDeliverySlot: string;
   itemsTotalKopecks: number;
@@ -67,12 +70,17 @@ export type DeliveryZone = {
   name: string;
   slug: string;
   description: string;
+  zoneType: DeliveryZoneType;
+  matchTerms: string[];
+  pricingMode: DeliveryPricingMode;
   basePriceKopecks: number;
   pricePerKmKopecks: number;
   freeFromKopecks: number | null;
   minimumOrderKopecks: number;
+  urgentDeliveryAvailable: boolean;
   urgentSurchargeKopecks: number;
   deliveryIntervals: string[];
+  requiresManagerConfirmation: boolean;
   isActive: boolean;
   sortOrder: number;
   createdAt: string;
@@ -130,3 +138,7 @@ export const defaultStoreSettings: StoreSettings = {
   homeDescription:
     "Соберём композицию под ваш повод и аккуратно привезём по Москве и области.",
 };
+import type {
+  DeliveryPricingMode,
+  DeliveryZoneType,
+} from "@/features/delivery/types";

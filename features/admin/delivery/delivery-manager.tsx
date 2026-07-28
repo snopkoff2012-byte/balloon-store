@@ -11,6 +11,7 @@ import {
 } from "@/features/admin/data/browser-repository";
 import { deliveryZoneFormSchema } from "@/features/admin/data/schemas";
 import type { DeliveryZone } from "@/features/admin/data/types";
+import { deliveryZoneTypeLabels } from "@/features/delivery/zone-utils";
 import { formatMoney } from "@/lib/money";
 
 type DeliveryFormValues = z.input<typeof deliveryZoneFormSchema>;
@@ -19,12 +20,17 @@ const emptyForm: DeliveryFormValues = {
   name: "",
   slug: "",
   description: "",
+  zoneType: "region_city",
+  matchTerms: "",
+  pricingMode: "fixed",
   basePriceRub: 0,
   pricePerKmRub: 0,
   freeFromRub: "",
   minimumOrderRub: 0,
+  urgentDeliveryAvailable: false,
   urgentSurchargeRub: 0,
   deliveryIntervals: "10:00–13:00\n13:00–16:00\n16:00–19:00\n19:00–22:00",
+  requiresManagerConfirmation: false,
   isActive: true,
   sortOrder: 0,
 };
@@ -34,13 +40,18 @@ function valuesFromZone(zone: DeliveryZone): DeliveryFormValues {
     name: zone.name,
     slug: zone.slug,
     description: zone.description,
+    zoneType: zone.zoneType,
+    matchTerms: zone.matchTerms.join("\n"),
+    pricingMode: zone.pricingMode,
     basePriceRub: zone.basePriceKopecks / 100,
     pricePerKmRub: zone.pricePerKmKopecks / 100,
     freeFromRub:
       zone.freeFromKopecks === null ? "" : zone.freeFromKopecks / 100,
     minimumOrderRub: zone.minimumOrderKopecks / 100,
+    urgentDeliveryAvailable: zone.urgentDeliveryAvailable,
     urgentSurchargeRub: zone.urgentSurchargeKopecks / 100,
     deliveryIntervals: zone.deliveryIntervals.join("\n"),
+    requiresManagerConfirmation: zone.requiresManagerConfirmation,
     isActive: zone.isActive,
     sortOrder: zone.sortOrder,
   };
@@ -83,6 +94,12 @@ export function DeliveryManager() {
       name: parsed.name,
       slug: parsed.slug,
       description: parsed.description,
+      zoneType: parsed.zoneType,
+      matchTerms: parsed.matchTerms
+        .split(/\r?\n|,/)
+        .map((item) => item.trim())
+        .filter(Boolean),
+      pricingMode: parsed.pricingMode,
       basePriceKopecks: Math.round(parsed.basePriceRub * 100),
       pricePerKmKopecks: Math.round(parsed.pricePerKmRub * 100),
       freeFromKopecks:
@@ -90,6 +107,7 @@ export function DeliveryManager() {
           ? null
           : Math.round(parsed.freeFromRub * 100),
       minimumOrderKopecks: Math.round(parsed.minimumOrderRub * 100),
+      urgentDeliveryAvailable: parsed.urgentDeliveryAvailable,
       urgentSurchargeKopecks: Math.round(
         parsed.urgentSurchargeRub * 100,
       ),
@@ -97,6 +115,7 @@ export function DeliveryManager() {
         .split(/\r?\n|,/)
         .map((item) => item.trim())
         .filter(Boolean),
+      requiresManagerConfirmation: parsed.requiresManagerConfirmation,
       isActive: parsed.isActive,
       sortOrder: parsed.sortOrder,
       createdAt: current?.createdAt ?? now,
@@ -213,6 +232,33 @@ export function DeliveryManager() {
             />
           </AdminField>
           <div className="grid grid-cols-2 gap-3">
+            <AdminField label="Тип зоны" error={errors.zoneType?.message}>
+              <select {...register("zoneType")} className="admin-input">
+                {Object.entries(deliveryZoneTypeLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+            <AdminField label="Расчёт стоимости">
+              <select {...register("pricingMode")} className="admin-input">
+                <option value="fixed">По тарифу зоны</option>
+                <option value="manual">Уточняет менеджер</option>
+              </select>
+            </AdminField>
+          </div>
+          <AdminField
+            label="Названия для автоподбора, по одному на строке"
+            error={errors.matchTerms?.message}
+          >
+            <textarea
+              {...register("matchTerms")}
+              className="admin-input min-h-20"
+              placeholder="Балашиха&#10;г. Балашиха"
+            />
+          </AdminField>
+          <div className="grid grid-cols-2 gap-3">
             <AdminField label="Стоимость, ₽">
               <input
                 type="number"
@@ -254,6 +300,13 @@ export function DeliveryManager() {
               className="admin-input"
             />
           </AdminField>
+          <label className="admin-check">
+            <input
+              type="checkbox"
+              {...register("urgentDeliveryAvailable")}
+            />
+            Доступна срочная доставка
+          </label>
           <AdminField
             label="Временные интервалы, по одному на строке"
             error={errors.deliveryIntervals?.message}
@@ -271,6 +324,13 @@ export function DeliveryManager() {
               className="admin-input"
             />
           </AdminField>
+          <label className="admin-check">
+            <input
+              type="checkbox"
+              {...register("requiresManagerConfirmation")}
+            />
+            Менеджер должен подтвердить адрес и стоимость
+          </label>
           <label className="admin-check">
             <input type="checkbox" {...register("isActive")} />
             Зона доступна покупателям
@@ -332,17 +392,26 @@ export function DeliveryManager() {
                     >
                       {zone.isActive ? "Активна" : "Скрыта"}
                     </span>
+                    <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700">
+                      {deliveryZoneTypeLabels[zone.zoneType]}
+                    </span>
+                    {zone.pricingMode === "manual" ? (
+                      <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800">
+                        Ручной расчёт
+                      </span>
+                    ) : null}
                   </div>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     {zone.description}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                     <b>
-                      От{" "}
-                      {formatMoney({
-                        amountKopecks: zone.basePriceKopecks,
-                        currency: "RUB",
-                      })}
+                      {zone.pricingMode === "manual"
+                        ? "Стоимость уточняет менеджер"
+                        : `Стоимость ${formatMoney({
+                            amountKopecks: zone.basePriceKopecks,
+                            currency: "RUB",
+                          })}`}
                     </b>
                     <span className="text-slate-500">
                       Минимальный заказ:{" "}
@@ -351,17 +420,28 @@ export function DeliveryManager() {
                         currency: "RUB",
                       })}
                     </span>
-                    <span className="text-slate-500">
-                      Срочно: +{" "}
-                      {formatMoney({
-                        amountKopecks: zone.urgentSurchargeKopecks,
-                        currency: "RUB",
-                      })}
-                    </span>
+                    {zone.urgentDeliveryAvailable ? (
+                      <span className="text-slate-500">
+                        Срочно: +{" "}
+                        {formatMoney({
+                          amountKopecks: zone.urgentSurchargeKopecks,
+                          currency: "RUB",
+                        })}
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">
+                        Срочная доставка недоступна
+                      </span>
+                    )}
                   </div>
                   <p className="mt-3 text-xs text-slate-500">
                     Интервалы: {zone.deliveryIntervals.join(", ")}
                   </p>
+                  {zone.matchTerms.length ? (
+                    <p className="mt-2 text-xs text-slate-500">
+                      Автоподбор: {zone.matchTerms.join(", ")}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button

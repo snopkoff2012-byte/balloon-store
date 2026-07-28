@@ -18,8 +18,8 @@ export function createCartMessage(items: CartItem[], cartUrl: string) {
     ...lines,
     "",
     `Товары: ${formatMoney({ amountKopecks: totals.itemsTotalKopecks, currency: "RUB" })}`,
-    `Доставка: ${totals.deliveryIsFree ? "бесплатно" : formatMoney({ amountKopecks: totals.deliveryKopecks, currency: "RUB" })}`,
-    `Итого: ${formatMoney({ amountKopecks: totals.totalKopecks, currency: "RUB" })}`,
+    "Доставка: рассчитать после выбора зоны",
+    `Предварительный итог без доставки: ${formatMoney({ amountKopecks: totals.itemsTotalKopecks, currency: "RUB" })}`,
     "",
     `Корзина: ${cartUrl}`,
   ].join("\n");
