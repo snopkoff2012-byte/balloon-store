@@ -8,6 +8,7 @@ import { useAdminData } from "@/features/admin/data/admin-data-provider";
 import { saveOrder } from "@/features/admin/data/browser-repository";
 import { orderUpdateSchema } from "@/features/admin/data/schemas";
 import type { AdminOrder } from "@/features/admin/data/types";
+import { PaymentLinkControls } from "@/features/admin/orders/payment-link-controls";
 import { formatMoney } from "@/lib/money";
 
 type OrderFormValues = z.input<typeof orderUpdateSchema>;
@@ -422,6 +423,13 @@ export function OrderManager() {
                 strong
               />
             </div>
+
+            <PaymentLinkControls
+              key={selected.id}
+              orderId={selected.id}
+              orderStatus={selected.status}
+              totalKopecks={selected.totalKopecks}
+            />
 
             {notice ? (
               <p
