@@ -14,6 +14,7 @@ import { useCatalogStore } from "@/features/catalog/store";
 import { getProductPrice } from "@/features/catalog/types";
 import { formatMoney } from "@/lib/money";
 import { useHydrated } from "@/lib/use-hydrated";
+import { MessengerButtons } from "@/components/messengers/messenger-buttons";
 
 function availabilityText(status: string, stock: number, madeToOrder: boolean) {
   if (madeToOrder || status === "preorder") return "Под заказ";
@@ -114,7 +115,15 @@ function ProductDetailsContent({ productId }: { productId: string }) {
       (!selectedVariant ||
         !selectedVariant.active ||
         selectedVariant.availabilityStatus === "out_of_stock" ||
-        selectedVariant.stockQuantity === 0));
+      selectedVariant.stockQuantity === 0));
+  const productMessage = [
+    "Здравствуйте! Хочу заказать товар:",
+    `Товар: ${product.name}`,
+    ...(selectedValues.length ? ["Варианты:", ...selectedValues.map(({ option, value }) => `• ${option.name}: ${value.label}`)] : []),
+    "Количество: 1 шт.",
+    `Цена: ${formatMoney({ amountKopecks: unitPrice, currency: "RUB" })}`,
+    `Ссылка: ${window.location.origin}/product/${product.slug}`,
+  ].join("\n");
 
   return (
     <Container className="py-10 sm:py-14">
@@ -267,6 +276,7 @@ function ProductDetailsContent({ productId }: { productId: string }) {
               disabled={unavailable}
             />
           </div>
+          <MessengerButtons message={productMessage} className="mt-3" />
 
           <section className="mt-8 border-t border-[#e5dbd6] pt-7">
             <h2 className="text-lg font-extrabold text-[#2f232c]">

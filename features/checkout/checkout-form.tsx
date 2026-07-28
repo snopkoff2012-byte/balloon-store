@@ -69,6 +69,7 @@ export function CheckoutForm({
   const settings = useStoreSettings();
   const items = useCartStore((state) => state.items);
   const clearCart = useCartStore((state) => state.clearCart);
+  const customerComment = useCartStore((state) => state.customerComment);
   const [submitError, setSubmitError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
@@ -84,6 +85,10 @@ export function CheckoutForm({
     resolver: zodResolver(checkoutDetailsSchema),
     defaultValues,
   });
+
+  useEffect(() => {
+    if (customerComment) setValue("comment", customerComment);
+  }, [customerComment, setValue]);
   const fulfillmentMethod = useWatch({ control, name: "fulfillmentMethod" });
   const deliveryZoneId = useWatch({ control, name: "deliveryZoneId" });
   const city = useWatch({ control, name: "city" });

@@ -4,6 +4,7 @@ import { loadPublicCatalog } from "@/features/catalog/server-repository";
 import { CatalogProvider } from "@/features/catalog/store";
 import { loadPublicStoreSettings } from "@/features/store-settings/server-repository";
 import { StoreSettingsProvider } from "@/features/store-settings/store";
+import { FloatingMessengers } from "@/components/messengers/floating-messengers";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export default async function StoreLayout({
       <SiteHeader settings={settings} />
       <main id="main-content">{children}</main>
       <SiteFooter settings={settings} />
+      <FloatingMessengers />
       </CatalogProvider>
     </StoreSettingsProvider>
   );

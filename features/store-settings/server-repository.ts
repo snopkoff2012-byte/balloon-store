@@ -75,7 +75,15 @@ export const loadPublicStoreSettings = cache(
         phone: asText(contacts.phone, defaultStoreSettings.phone),
         email: asText(contacts.email, defaultStoreSettings.email),
         telegram: asText(contacts.telegram, defaultStoreSettings.telegram),
+        telegramEnabled:
+          typeof contacts.telegramEnabled === "boolean"
+            ? contacts.telegramEnabled
+            : defaultStoreSettings.telegramEnabled,
         whatsapp: asText(contacts.whatsapp, defaultStoreSettings.whatsapp),
+        whatsappEnabled:
+          typeof contacts.whatsappEnabled === "boolean"
+            ? contacts.whatsappEnabled
+            : defaultStoreSettings.whatsappEnabled,
         address: asText(contacts.address, defaultStoreSettings.address),
         workingHours: asText(hours.daily, defaultStoreSettings.workingHours),
         minimumOrderRub: asNonNegativeNumber(

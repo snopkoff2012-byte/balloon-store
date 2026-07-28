@@ -6,16 +6,19 @@ import type { CartItem } from "./types";
 
 type CartStore = {
   items: CartItem[];
+  customerComment: string;
   addItem: (item: CartItem) => void;
   updateQuantity: (variantId: string, quantity: number) => void;
   removeItem: (variantId: string) => void;
   clearCart: () => void;
+  setCustomerComment: (comment: string) => void;
 };
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set) => ({
       items: [],
+      customerComment: "",
       addItem: (item) =>
         set((state) => {
           const existingItem = state.items.find(
@@ -53,6 +56,7 @@ export const useCartStore = create<CartStore>()(
           items: state.items.filter((item) => item.variantId !== variantId),
         })),
       clearCart: () => set({ items: [] }),
+      setCustomerComment: (customerComment) => set({ customerComment }),
     }),
     {
       name: "balloon-store-cart",

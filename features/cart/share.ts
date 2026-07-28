@@ -2,13 +2,11 @@ import { formatMoney } from "@/lib/money";
 import { getCartTotals } from "./pricing";
 import type { CartItem } from "./types";
 
-export function createCartMessage(items: CartItem[], cartUrl: string) {
+export function createCartMessage(items: CartItem[], cartUrl: string, customerComment = "") {
   const totals = getCartTotals(items);
   const lines = items.flatMap((item, index) => [
     `${index + 1}. ${item.productName}`,
-    ...(item.selectedOptionLabels.length > 0
-      ? [`   ${item.selectedOptionLabels.join(", ")}`]
-      : []),
+    ...(item.selectedOptionLabels.length ? [`   ${item.selectedOptionLabels.join(", ")}`] : []),
     `   ${item.quantity} шт. × ${formatMoney({ amountKopecks: item.unitPriceKopecks, currency: "RUB" })}`,
   ]);
 
@@ -17,18 +15,13 @@ export function createCartMessage(items: CartItem[], cartUrl: string) {
     "",
     ...lines,
     "",
-    `Товары: ${formatMoney({ amountKopecks: totals.itemsTotalKopecks, currency: "RUB" })}`,
+    `Промежуточная сумма: ${formatMoney({ amountKopecks: totals.itemsTotalKopecks, currency: "RUB" })}`,
     "Доставка: рассчитать после выбора зоны",
-    `Предварительный итог без доставки: ${formatMoney({ amountKopecks: totals.itemsTotalKopecks, currency: "RUB" })}`,
+    `Итог: ${formatMoney({ amountKopecks: totals.itemsTotalKopecks, currency: "RUB" })} (без доставки)`,
+    ...(customerComment.trim() ? ["", `Комментарий: ${customerComment.trim()}`] : []),
     "",
     `Корзина: ${cartUrl}`,
   ].join("\n");
 }
 
-export function createTelegramShareUrl(message: string, cartUrl: string) {
-  return `https://t.me/share/url?url=${encodeURIComponent(cartUrl)}&text=${encodeURIComponent(message)}`;
-}
-
-export function createWhatsAppShareUrl(message: string) {
-  return `https://wa.me/74950000000?text=${encodeURIComponent(message)}`;
-}
+export const createCartMessageWithComment = createCartMessage;

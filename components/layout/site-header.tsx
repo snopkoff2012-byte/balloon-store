@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/container";
 import type { StoreSettings } from "@/features/admin/data/types";
 import { mainNavigation } from "@/lib/navigation";
 import { phoneHref } from "@/features/store-settings/links";
+import { MessengerButtons } from "@/components/messengers/messenger-buttons";
 import { MobileMenu } from "./mobile-menu";
 
 export function SiteHeader({ settings }: { settings: StoreSettings }) {
@@ -58,6 +59,9 @@ export function SiteHeader({ settings }: { settings: StoreSettings }) {
           </nav>
 
           <div className="flex items-center gap-2">
+            <div className="hidden lg:block">
+              <MessengerButtons compact message="Здравствуйте! Хочу уточнить детали заказа воздушных шаров." />
+            </div>
             <a
               href={phoneHref(settings.phone)}
               className="hidden text-right md:block"

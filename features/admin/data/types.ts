@@ -109,7 +109,9 @@ export type StoreSettings = {
   phone: string;
   email: string;
   telegram: string;
+  telegramEnabled: boolean;
   whatsapp: string;
+  whatsappEnabled: boolean;
   address: string;
   workingHours: string;
   minimumOrderRub: number;
@@ -129,7 +131,9 @@ export const defaultStoreSettings: StoreSettings = {
   phone: "+7 (495) 000-00-00",
   email: "hello@example.ru",
   telegram: "balloon_moscow_demo",
+  telegramEnabled: true,
   whatsapp: "+7 495 000-00-00",
+  whatsappEnabled: true,
   address: "Москва, Большая Никитская улица, 24",
   workingHours: "09:00–21:00",
   minimumOrderRub: 3000,

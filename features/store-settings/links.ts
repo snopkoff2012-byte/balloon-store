@@ -19,3 +19,16 @@ export function whatsappHref(whatsapp: string) {
   }
   return `https://wa.me/${normalized.replace(/\D/g, "")}`;
 }
+
+function appendMessage(url: string, message: string) {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}text=${encodeURIComponent(message)}`;
+}
+
+export function telegramMessageHref(telegram: string, message: string) {
+  return appendMessage(telegramHref(telegram), message);
+}
+
+export function whatsappMessageHref(whatsapp: string, message: string) {
+  return appendMessage(whatsappHref(whatsapp), message);
+}

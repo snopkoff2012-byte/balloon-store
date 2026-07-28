@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormRegisterReturn } from "react-hook-form";
 import { z } from "zod";
 import { useAdminData } from "@/features/admin/data/admin-data-provider";
 import { saveStoreSettings } from "@/features/admin/data/browser-repository";
@@ -76,9 +76,11 @@ export function SettingsManager() {
             <AdminField label="Telegram">
               <input {...register("telegram")} className="admin-input" />
             </AdminField>
+            <CheckField label="Показывать Telegram" input={register("telegramEnabled")} />
             <AdminField label="WhatsApp">
               <input {...register("whatsapp")} className="admin-input" />
             </AdminField>
+            <CheckField label="Показывать WhatsApp" input={register("whatsappEnabled")} />
           </div>
           <AdminField label="Адрес">
             <input {...register("address")} className="admin-input" />
@@ -184,4 +186,8 @@ function AdminField({
       {error ? <span className="text-xs text-red-600">{error}</span> : null}
     </label>
   );
+}
+
+function CheckField({ label, input }: { label: string; input: UseFormRegisterReturn }) {
+  return <label className="flex items-center gap-3 self-end rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700"><input type="checkbox" {...input} className="size-4 accent-rose-600" />{label}</label>;
 }

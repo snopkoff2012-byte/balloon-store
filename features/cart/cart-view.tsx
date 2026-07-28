@@ -7,7 +7,8 @@ import { formatMoney } from "@/lib/money";
 import { useHydrated } from "@/lib/use-hydrated";
 import { getCartItemAvailability } from "./availability";
 import { getCartTotals } from "./pricing";
-import { createCartMessage, createTelegramShareUrl, createWhatsAppShareUrl } from "./share";
+import { createCartMessageWithComment } from "./share";
+import { MessengerButtons } from "@/components/messengers/messenger-buttons";
 import { useCartStore } from "./store";
 
 export function CartView() {
@@ -16,6 +17,8 @@ export function CartView() {
   const items = useCartStore((state) => state.items);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const removeItem = useCartStore((state) => state.removeItem);
+  const customerComment = useCartStore((state) => state.customerComment);
+  const setCustomerComment = useCartStore((state) => state.setCustomerComment);
 
   if (!isMounted) {
     return (
@@ -38,7 +41,7 @@ export function CartView() {
     !getCartItemAvailability(product, item).available,
   );
   const cartUrl = `${window.location.origin}/cart`;
-  const message = createCartMessage(items, cartUrl);
+  const message = createCartMessageWithComment(items, cartUrl, customerComment);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -155,6 +158,9 @@ export function CartView() {
           </Link>
         )}
         <div className="mt-4 grid gap-2">
+          <label className="grid gap-2 text-sm font-bold text-white">Комментарий к заказу<textarea value={customerComment} onChange={(event) => setCustomerComment(event.target.value)} maxLength={1000} className="min-h-20 rounded-xl border border-white/20 bg-white/10 p-3 text-sm font-medium text-white placeholder:text-white/45" placeholder="Пожелания к композиции или доставке" /></label>
+          <MessengerButtons message={message} />
+          {/* Старые ссылки оставлены отключёнными для совместимости разметки.
           <a
             href={createTelegramShareUrl(message, cartUrl)}
             target="_blank"
@@ -162,15 +168,15 @@ export function CartView() {
             className="rounded-2xl border border-white/20 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-white/10 active:scale-[0.98]"
           >
             Отправить корзину в Telegram
-          </a>
-          <a
-            href={createWhatsAppShareUrl(message)}
+          </a> */}
+          {false ? (<a
+            href="#"
             target="_blank"
             rel="noreferrer"
             className="rounded-2xl border border-white/20 px-4 py-3 text-center text-sm font-bold text-white transition hover:bg-white/10 active:scale-[0.98]"
           >
             Отправить корзину в WhatsApp
-          </a>
+          </a>) : null}
         </div>
       </aside>
     </div>
